@@ -1,0 +1,524 @@
+<!doctype html>
+<html lang="pl">
+<head>
+    <meta charset="utf-8">
+    <title>PDF → JPK XML</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f3f4f6;
+        }
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 24px 16px 48px;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        p {
+            margin-top: 0;
+            color: #4b5563;
+        }
+        form {
+            margin-top: 16px;
+            padding: 16px;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+        .field {
+            margin-bottom: 12px;
+        }
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        input[type="file"],
+        input[type="text"] {
+            width: 100%;
+            font-size: 14px;
+            padding: 6px 8px;
+            border-radius: 4px;
+            border: 1px solid #d1d5db;
+            box-sizing: border-box;
+        }
+        button {
+            border: none;
+            border-radius: 4px;
+            background: #2563eb;
+            color: #ffffff;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #1d4ed8;
+        }
+        .error {
+            margin-top: 12px;
+            color: #b91c1c;
+            font-size: 14px;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 16px;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+        textarea {
+            width: 100%;
+            box-sizing: border-box;
+            min-height: 320px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-size: 12px;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #d1d5db;
+            resize: vertical;
+        }
+        .hint {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Konwerter faktur PDF → JPK XML</h1>
+    <p>Wgraj fakturę w PDF, a aplikacja spróbuje wygenerować plik JPK_FA w XML na podstawie odczytanych danych.</p>
+
+    <form method="post" enctype="multipart/form-data">
+        <div class="field">
+            <label for="company_name">Nazwa firmy (sprzedawca)</label>
+            <input type="text" id="company_name" name="company_name" value="dajstrone.pl Dominik Musial">
+        </div>
+        <div class="field">
+            <label for="company_nip">NIP firmy</label>
+            <input type="text" id="company_nip" name="company_nip" value="6562276928">
+        </div>
+        <div class="field">
+            <label for="office_code">Kod urzędu skarbowego</label>
+            <input type="text" id="office_code" name="office_code" value="2603">
+        </div>
+        <div class="field">
+            <label for="invoice_pdf">Plik faktury PDF</label>
+            <input type="file" id="invoice_pdf" name="invoice_pdf" accept="application/pdf" required>
+        </div>
+        <button type="submit">Generuj JPK XML</button>
+        <div class="hint">
+            Do dokładnego działania trzeba dopasować wyrażenia regularne do formatów Twoich faktur i dopracować strukturę JPK zgodnie z oficjalnym XSD (np. JPK_FA lub JPK_V7).
+        </div>
+            </form>
+
+            <div class="result">
+            <h2>Odczytane dane z faktury</h2>
+            <textarea readonly>array (
+  0 =&gt; 
+  array (
+    &#039;invoice_number&#039; =&gt; &#039;16/02/2026&#039;,
+    &#039;issue_date&#039; =&gt; &#039;2026-02-19&#039;,
+    &#039;sell_date&#039; =&gt; &#039;2026-02-19&#039;,
+    &#039;buyer_nip&#039; =&gt; &#039;6322033623&#039;,
+    &#039;seller_nip&#039; =&gt; &#039;6562276928&#039;,
+    &#039;net_amount&#039; =&gt; &#039;750.00&#039;,
+    &#039;vat_rate&#039; =&gt; &#039;23&#039;,
+    &#039;vat_amount&#039; =&gt; &#039;172.50&#039;,
+    &#039;gross_amount&#039; =&gt; &#039;922.50&#039;,
+    &#039;currency&#039; =&gt; &#039;PLN&#039;,
+    &#039;buyer_name&#039; =&gt; &#039;Exclusive Kicks Krystian Gędłek Tulipanowa 3a&#039;,
+  ),
+  1 =&gt; 
+  array (
+    &#039;invoice_number&#039; =&gt; &#039;15/02/2026&#039;,
+    &#039;issue_date&#039; =&gt; &#039;2026-02-11&#039;,
+    &#039;sell_date&#039; =&gt; &#039;2026-02-11&#039;,
+    &#039;buyer_nip&#039; =&gt; &#039;6562331343&#039;,
+    &#039;seller_nip&#039; =&gt; &#039;6562276928&#039;,
+    &#039;net_amount&#039; =&gt; &#039;50.00&#039;,
+    &#039;vat_rate&#039; =&gt; &#039;23&#039;,
+    &#039;vat_amount&#039; =&gt; &#039;11.50&#039;,
+    &#039;gross_amount&#039; =&gt; &#039;61.50&#039;,
+    &#039;currency&#039; =&gt; &#039;PLN&#039;,
+    &#039;buyer_name&#039; =&gt; &#039;F.H.U ENDORFINA MARCIN WAWER RENATA WAWER SPÓŁKA CYWILNA&#039;,
+  ),
+  2 =&gt; 
+  array (
+    &#039;invoice_number&#039; =&gt; &#039;14/02/2026&#039;,
+    &#039;issue_date&#039; =&gt; &#039;2026-02-11&#039;,
+    &#039;sell_date&#039; =&gt; &#039;2026-02-11&#039;,
+    &#039;buyer_nip&#039; =&gt; &#039;6642078604&#039;,
+    &#039;seller_nip&#039; =&gt; &#039;6562276928&#039;,
+    &#039;net_amount&#039; =&gt; &#039;342.00&#039;,
+    &#039;vat_rate&#039; =&gt; &#039;23&#039;,
+    &#039;vat_amount&#039; =&gt; &#039;78.66&#039;,
+    &#039;gross_amount&#039; =&gt; &#039;420.66&#039;,
+    &#039;currency&#039; =&gt; &#039;PLN&#039;,
+    &#039;buyer_name&#039; =&gt; &#039;Iwetta Spadło Biuro Usług Geodezyjnych INTER-GEO Radomska 29/314&#039;,
+  ),
+  3 =&gt; 
+  array (
+    &#039;invoice_number&#039; =&gt; &#039;13/02/2026&#039;,
+    &#039;issue_date&#039; =&gt; &#039;2026-02-11&#039;,
+    &#039;sell_date&#039; =&gt; &#039;2026-02-11&#039;,
+    &#039;buyer_nip&#039; =&gt; &#039;7971923107&#039;,
+    &#039;seller_nip&#039; =&gt; &#039;6562276928&#039;,
+    &#039;net_amount&#039; =&gt; &#039;317.07&#039;,
+    &#039;vat_rate&#039; =&gt; &#039;23&#039;,
+    &#039;vat_amount&#039; =&gt; &#039;72.93&#039;,
+    &#039;gross_amount&#039; =&gt; &#039;390.00&#039;,
+    &#039;currency&#039; =&gt; &#039;PLN&#039;,
+    &#039;buyer_name&#039; =&gt; &#039;KOP - KOS - TRANS ROBOTY ZIEMNE Kamil Słomka Rożce 24&#039;,
+  ),
+  4 =&gt; 
+  array (
+    &#039;invoice_number&#039; =&gt; &#039;12/02/2026&#039;,
+    &#039;issue_date&#039; =&gt; &#039;2026-02-09&#039;,
+    &#039;sell_date&#039; =&gt; &#039;2026-02-09&#039;,
+    &#039;buyer_nip&#039; =&gt; &#039;6572984590&#039;,
+    &#039;seller_nip&#039; =&gt; &#039;6562276928&#039;,
+    &#039;net_amount&#039; =&gt; &#039;342.00&#039;,
+    &#039;vat_rate&#039; =&gt; &#039;23&#039;,
+    &#039;vat_amount&#039; =&gt; &#039;78.66&#039;,
+    &#039;gross_amount&#039; =&gt; &#039;420.66&#039;,
+    &#039;currency&#039; =&gt; &#039;PLN&#039;,
+    &#039;buyer_name&#039; =&gt; &#039;AGRI MATRIX SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ al. Solidarności 34&#039;,
+  ),
+  5 =&gt; 
+  array (
+    &#039;invoice_number&#039; =&gt; &#039;11/02/2026&#039;,
+    &#039;issue_date&#039; =&gt; &#039;2026-02-05&#039;,
+    &#039;sell_date&#039; =&gt; &#039;2026-02-05&#039;,
+    &#039;buyer_nip&#039; =&gt; &#039;9591579231&#039;,
+    &#039;seller_nip&#039; =&gt; &#039;6562276928&#039;,
+    &#039;net_amount&#039; =&gt; &#039;300.00&#039;,
+    &#039;vat_rate&#039; =&gt; &#039;23&#039;,
+    &#039;vat_amount&#039; =&gt; &#039;69.00&#039;,
+    &#039;gross_amount&#039; =&gt; &#039;369.00&#039;,
+    &#039;currency&#039; =&gt; &#039;PLN&#039;,
+    &#039;buyer_name&#039; =&gt; &#039;51102027330000220201029073 BPKOPLPW | PLN Błażej Stępień CARBON&#039;,
+  ),
+  6 =&gt; 
+  array (
+    &#039;invoice_number&#039; =&gt; &#039;9/02/2026&#039;,
+    &#039;issue_date&#039; =&gt; &#039;2026-02-01&#039;,
+    &#039;sell_date&#039; =&gt; &#039;2026-02-01&#039;,
+    &#039;buyer_nip&#039; =&gt; &#039;9590892032&#039;,
+    &#039;seller_nip&#039; =&gt; &#039;6562276928&#039;,
+    &#039;net_amount&#039; =&gt; &#039;440.00&#039;,
+    &#039;vat_rate&#039; =&gt; &#039;23&#039;,
+    &#039;vat_amount&#039; =&gt; &#039;101.20&#039;,
+    &#039;gross_amount&#039; =&gt; &#039;541.20&#039;,
+    &#039;currency&#039; =&gt; &#039;PLN&#039;,
+    &#039;buyer_name&#039; =&gt; &#039;Konto: 51 1020 2733 0000 2202 0102 9073 Bank: PKO Bank Polski S.A.&#039;,
+  ),
+  7 =&gt; 
+  array (
+    &#039;invoice_number&#039; =&gt; &#039;8/02/2026&#039;,
+    &#039;issue_date&#039; =&gt; &#039;2026-02-01&#039;,
+    &#039;sell_date&#039; =&gt; &#039;2026-02-01&#039;,
+    &#039;buyer_nip&#039; =&gt; &#039;6572050491&#039;,
+    &#039;seller_nip&#039; =&gt; &#039;6562276928&#039;,
+    &#039;net_amount&#039; =&gt; &#039;600.00&#039;,
+    &#039;vat_rate&#039; =&gt; &#039;23&#039;,
+    &#039;vat_amount&#039; =&gt; &#039;138.00&#039;,
+    &#039;gross_amount&#039; =&gt; &#039;738.00&#039;,
+    &#039;currency&#039; =&gt; &#039;PLN&#039;,
+    &#039;buyer_name&#039; =&gt; &#039;Konto: 51 1020 2733 0000 2202 0102 9073 Bank: PKO Bank Polski S.A.&#039;,
+  ),
+  8 =&gt; 
+  array (
+    &#039;invoice_number&#039; =&gt; &#039;7/02/2026&#039;,
+    &#039;issue_date&#039; =&gt; &#039;2026-02-01&#039;,
+    &#039;sell_date&#039; =&gt; &#039;2026-02-01&#039;,
+    &#039;buyer_nip&#039; =&gt; &#039;6561907806&#039;,
+    &#039;seller_nip&#039; =&gt; &#039;6562276928&#039;,
+    &#039;net_amount&#039; =&gt; &#039;380.00&#039;,
+    &#039;vat_rate&#039; =&gt; &#039;23&#039;,
+    &#039;vat_amount&#039; =&gt; &#039;87.40&#039;,
+    &#039;gross_amount&#039; =&gt; &#039;467.40&#039;,
+    &#039;currency&#039; =&gt; &#039;PLN&#039;,
+    &#039;buyer_name&#039; =&gt; &#039;Konto: 51 1020 2733 0000 2202 0102 9073 Bank: PKO Bank Polski S.A.&#039;,
+  ),
+  9 =&gt; 
+  array (
+    &#039;invoice_number&#039; =&gt; &#039;6/02/2026&#039;,
+    &#039;issue_date&#039; =&gt; &#039;2026-02-01&#039;,
+    &#039;sell_date&#039; =&gt; &#039;2026-02-01&#039;,
+    &#039;buyer_nip&#039; =&gt; &#039;6561002040&#039;,
+    &#039;seller_nip&#039; =&gt; &#039;6562276928&#039;,
+    &#039;net_amount&#039; =&gt; &#039;406.50&#039;,
+    &#039;vat_rate&#039; =&gt; &#039;23&#039;,
+    &#039;vat_amount&#039; =&gt; &#039;93.50&#039;,
+    &#039;gross_amount&#039; =&gt; &#039;500.00&#039;,
+    &#039;currency&#039; =&gt; &#039;PLN&#039;,
+    &#039;buyer_name&#039; =&gt; &#039;Konto: 51 1020 2733 0000 2202 0102 9073 Bank: PKO Bank Polski S.A.&#039;,
+  ),
+  10 =&gt; 
+  array (
+    &#039;invoice_number&#039; =&gt; &#039;5/02/2026&#039;,
+    &#039;issue_date&#039; =&gt; &#039;2026-02-01&#039;,
+    &#039;sell_date&#039; =&gt; &#039;2026-02-01&#039;,
+    &#039;buyer_nip&#039; =&gt; &#039;6561080488&#039;,
+    &#039;seller_nip&#039; =&gt; &#039;6562276928&#039;,
+    &#039;net_amount&#039; =&gt; &#039;245.00&#039;,
+    &#039;vat_rate&#039; =&gt; &#039;23&#039;,
+    &#039;vat_amount&#039; =&gt; &#039;56.35&#039;,
+    &#039;gross_amount&#039; =&gt; &#039;301.35&#039;,
+    &#039;currency&#039; =&gt; &#039;PLN&#039;,
+    &#039;buyer_name&#039; =&gt; &#039;Konto: 51 1020 2733 0000 2202 0102 9073 Bank: PKO Bank Polski S.A.&#039;,
+  ),
+  11 =&gt; 
+  array (
+    &#039;invoice_number&#039; =&gt; &#039;4/02/2026&#039;,
+    &#039;issue_date&#039; =&gt; &#039;2026-02-01&#039;,
+    &#039;sell_date&#039; =&gt; &#039;2026-02-01&#039;,
+    &#039;buyer_nip&#039; =&gt; &#039;6562302324&#039;,
+    &#039;seller_nip&#039; =&gt; &#039;6562276928&#039;,
+    &#039;net_amount&#039; =&gt; &#039;400.00&#039;,
+    &#039;vat_rate&#039; =&gt; &#039;23&#039;,
+    &#039;vat_amount&#039; =&gt; &#039;92.00&#039;,
+    &#039;gross_amount&#039; =&gt; &#039;492.00&#039;,
+    &#039;currency&#039; =&gt; &#039;PLN&#039;,
+    &#039;buyer_name&#039; =&gt; &#039;Konto: 51 1020 2733 0000 2202 0102 9073 Bank: PKO Bank Polski S.A.&#039;,
+  ),
+  12 =&gt; 
+  array (
+    &#039;invoice_number&#039; =&gt; &#039;2/02/2026&#039;,
+    &#039;issue_date&#039; =&gt; &#039;2026-02-01&#039;,
+    &#039;sell_date&#039; =&gt; &#039;2026-02-01&#039;,
+    &#039;buyer_nip&#039; =&gt; &#039;8111641048&#039;,
+    &#039;seller_nip&#039; =&gt; &#039;6562276928&#039;,
+    &#039;net_amount&#039; =&gt; &#039;250.00&#039;,
+    &#039;vat_rate&#039; =&gt; &#039;23&#039;,
+    &#039;vat_amount&#039; =&gt; &#039;57.50&#039;,
+    &#039;gross_amount&#039; =&gt; &#039;307.50&#039;,
+    &#039;currency&#039; =&gt; &#039;PLN&#039;,
+    &#039;buyer_name&#039; =&gt; &#039;Konto: 51 1020 2733 0000 2202 0102 9073 Bank: PKO Bank Polski S.A.&#039;,
+  ),
+  13 =&gt; 
+  array (
+    &#039;invoice_number&#039; =&gt; &#039;1/02/2026&#039;,
+    &#039;issue_date&#039; =&gt; &#039;2026-02-01&#039;,
+    &#039;sell_date&#039; =&gt; &#039;2026-02-01&#039;,
+    &#039;buyer_nip&#039; =&gt; &#039;8111723007&#039;,
+    &#039;seller_nip&#039; =&gt; &#039;6562276928&#039;,
+    &#039;net_amount&#039; =&gt; &#039;245.00&#039;,
+    &#039;vat_rate&#039; =&gt; &#039;23&#039;,
+    &#039;vat_amount&#039; =&gt; &#039;56.35&#039;,
+    &#039;gross_amount&#039; =&gt; &#039;301.35&#039;,
+    &#039;currency&#039; =&gt; &#039;PLN&#039;,
+    &#039;buyer_name&#039; =&gt; &#039;Konto: 51 1020 2733 0000 2202 0102 9073 Bank: PKO Bank Polski S.A.&#039;,
+  ),
+)</textarea>
+            <div class="hint">
+                Sprawdź, czy wartości zgadzają się z fakturami. Jeśli coś jest błędne albo puste, trzeba dostosować wyrażenia regularne w funkcji <strong>extractInvoiceDataFromText</strong>.
+            </div>
+        </div>
+    
+            <div class="result">
+            <h2>Wygenerowany JPK XML</h2>
+            <textarea readonly>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;tns:JPK xmlns:tns=&quot;http://crd.gov.pl/wzor/2021/12/27/11148/&quot; xmlns:etd=&quot;http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2021/06/08/eD/DefinicjeTypy/&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;&gt;
+  &lt;tns:Naglowek&gt;
+    &lt;tns:KodFormularza kodSystemowy=&quot;JPK_V7M (2)&quot; wersjaSchemy=&quot;1-0E&quot;&gt;JPK_VAT&lt;/tns:KodFormularza&gt;
+    &lt;tns:WariantFormularza&gt;2&lt;/tns:WariantFormularza&gt;
+    &lt;tns:DataWytworzeniaJPK&gt;2026-02-19T18:00:07Z&lt;/tns:DataWytworzeniaJPK&gt;
+    &lt;tns:NazwaSystemu&gt;PDF2JPK&lt;/tns:NazwaSystemu&gt;
+    &lt;tns:CelZlozenia poz=&quot;P_7&quot;&gt;1&lt;/tns:CelZlozenia&gt;
+    &lt;tns:KodUrzedu&gt;2603&lt;/tns:KodUrzedu&gt;
+    &lt;tns:Rok&gt;2026&lt;/tns:Rok&gt;
+    &lt;tns:Miesiac&gt;2&lt;/tns:Miesiac&gt;
+  &lt;/tns:Naglowek&gt;
+  &lt;tns:Podmiot1 rola=&quot;Podatnik&quot;&gt;
+    &lt;tns:OsobaFizyczna xmlns:etd=&quot;http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2021/06/08/eD/DefinicjeTypy/&quot;&gt;
+      &lt;etd:NIP xmlns:etd=&quot;http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2021/06/08/eD/DefinicjeTypy/&quot;&gt;6562276928&lt;/etd:NIP&gt;
+      &lt;etd:ImiePierwsze xmlns:etd=&quot;http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2021/06/08/eD/DefinicjeTypy/&quot;&gt;Dominik&lt;/etd:ImiePierwsze&gt;
+      &lt;etd:Nazwisko xmlns:etd=&quot;http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2021/06/08/eD/DefinicjeTypy/&quot;&gt;Musiał&lt;/etd:Nazwisko&gt;
+      &lt;etd:DataUrodzenia xmlns:etd=&quot;http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2021/06/08/eD/DefinicjeTypy/&quot;&gt;1989-07-13&lt;/etd:DataUrodzenia&gt;
+      &lt;tns:Email&gt;dominik.musial1989@gmail.com&lt;/tns:Email&gt;
+      &lt;tns:Telefon&gt;512736370&lt;/tns:Telefon&gt;
+    &lt;/tns:OsobaFizyczna&gt;
+  &lt;/tns:Podmiot1&gt;
+  &lt;tns:Deklaracja&gt;
+    &lt;tns:Naglowek&gt;
+      &lt;tns:KodFormularzaDekl kodSystemowy=&quot;VAT-7 (22)&quot; kodPodatku=&quot;VAT&quot; rodzajZobowiazania=&quot;Z&quot; wersjaSchemy=&quot;1-0E&quot;&gt;VAT-7&lt;/tns:KodFormularzaDekl&gt;
+      &lt;tns:WariantFormularzaDekl&gt;22&lt;/tns:WariantFormularzaDekl&gt;
+    &lt;/tns:Naglowek&gt;
+    &lt;tns:PozycjeSzczegolowe&gt;
+      &lt;tns:P_19&gt;5067.57&lt;/tns:P_19&gt;
+      &lt;tns:P_20&gt;1165.55&lt;/tns:P_20&gt;
+      &lt;tns:P_37&gt;5067.57&lt;/tns:P_37&gt;
+      &lt;tns:P_38&gt;1165.55&lt;/tns:P_38&gt;
+      &lt;tns:P_51&gt;1165.55&lt;/tns:P_51&gt;
+    &lt;/tns:PozycjeSzczegolowe&gt;
+    &lt;tns:Pouczenia&gt;1&lt;/tns:Pouczenia&gt;
+  &lt;/tns:Deklaracja&gt;
+  &lt;tns:Ewidencja&gt;
+    &lt;tns:SprzedazWiersz&gt;
+      &lt;tns:LpSprzedazy&gt;1&lt;/tns:LpSprzedazy&gt;
+      &lt;tns:NrKontrahenta&gt;6322033623&lt;/tns:NrKontrahenta&gt;
+      &lt;tns:NazwaKontrahenta&gt;Exclusive Kicks Krystian Gędłek Tulipanowa 3a&lt;/tns:NazwaKontrahenta&gt;
+      &lt;tns:DowodSprzedazy&gt;16/02/2026&lt;/tns:DowodSprzedazy&gt;
+      &lt;tns:DataWystawienia&gt;2026-02-19&lt;/tns:DataWystawienia&gt;
+      &lt;tns:GTU_12&gt;1&lt;/tns:GTU_12&gt;
+      &lt;tns:K_19&gt;750.00&lt;/tns:K_19&gt;
+      &lt;tns:K_20&gt;172.50&lt;/tns:K_20&gt;
+    &lt;/tns:SprzedazWiersz&gt;
+    &lt;tns:SprzedazWiersz&gt;
+      &lt;tns:LpSprzedazy&gt;2&lt;/tns:LpSprzedazy&gt;
+      &lt;tns:NrKontrahenta&gt;6562331343&lt;/tns:NrKontrahenta&gt;
+      &lt;tns:NazwaKontrahenta&gt;F.H.U ENDORFINA MARCIN WAWER RENATA WAWER SPÓŁKA CYWILNA&lt;/tns:NazwaKontrahenta&gt;
+      &lt;tns:DowodSprzedazy&gt;15/02/2026&lt;/tns:DowodSprzedazy&gt;
+      &lt;tns:DataWystawienia&gt;2026-02-11&lt;/tns:DataWystawienia&gt;
+      &lt;tns:GTU_12&gt;1&lt;/tns:GTU_12&gt;
+      &lt;tns:K_19&gt;50.00&lt;/tns:K_19&gt;
+      &lt;tns:K_20&gt;11.50&lt;/tns:K_20&gt;
+    &lt;/tns:SprzedazWiersz&gt;
+    &lt;tns:SprzedazWiersz&gt;
+      &lt;tns:LpSprzedazy&gt;3&lt;/tns:LpSprzedazy&gt;
+      &lt;tns:NrKontrahenta&gt;6642078604&lt;/tns:NrKontrahenta&gt;
+      &lt;tns:NazwaKontrahenta&gt;Iwetta Spadło Biuro Usług Geodezyjnych INTER-GEO Radomska 29/314&lt;/tns:NazwaKontrahenta&gt;
+      &lt;tns:DowodSprzedazy&gt;14/02/2026&lt;/tns:DowodSprzedazy&gt;
+      &lt;tns:DataWystawienia&gt;2026-02-11&lt;/tns:DataWystawienia&gt;
+      &lt;tns:GTU_12&gt;1&lt;/tns:GTU_12&gt;
+      &lt;tns:K_19&gt;342.00&lt;/tns:K_19&gt;
+      &lt;tns:K_20&gt;78.66&lt;/tns:K_20&gt;
+    &lt;/tns:SprzedazWiersz&gt;
+    &lt;tns:SprzedazWiersz&gt;
+      &lt;tns:LpSprzedazy&gt;4&lt;/tns:LpSprzedazy&gt;
+      &lt;tns:NrKontrahenta&gt;7971923107&lt;/tns:NrKontrahenta&gt;
+      &lt;tns:NazwaKontrahenta&gt;KOP - KOS - TRANS ROBOTY ZIEMNE Kamil Słomka Rożce 24&lt;/tns:NazwaKontrahenta&gt;
+      &lt;tns:DowodSprzedazy&gt;13/02/2026&lt;/tns:DowodSprzedazy&gt;
+      &lt;tns:DataWystawienia&gt;2026-02-11&lt;/tns:DataWystawienia&gt;
+      &lt;tns:GTU_12&gt;1&lt;/tns:GTU_12&gt;
+      &lt;tns:K_19&gt;317.07&lt;/tns:K_19&gt;
+      &lt;tns:K_20&gt;72.93&lt;/tns:K_20&gt;
+    &lt;/tns:SprzedazWiersz&gt;
+    &lt;tns:SprzedazWiersz&gt;
+      &lt;tns:LpSprzedazy&gt;5&lt;/tns:LpSprzedazy&gt;
+      &lt;tns:NrKontrahenta&gt;6572984590&lt;/tns:NrKontrahenta&gt;
+      &lt;tns:NazwaKontrahenta&gt;AGRI MATRIX SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ al. Solidarności 34&lt;/tns:NazwaKontrahenta&gt;
+      &lt;tns:DowodSprzedazy&gt;12/02/2026&lt;/tns:DowodSprzedazy&gt;
+      &lt;tns:DataWystawienia&gt;2026-02-09&lt;/tns:DataWystawienia&gt;
+      &lt;tns:GTU_12&gt;1&lt;/tns:GTU_12&gt;
+      &lt;tns:K_19&gt;342.00&lt;/tns:K_19&gt;
+      &lt;tns:K_20&gt;78.66&lt;/tns:K_20&gt;
+    &lt;/tns:SprzedazWiersz&gt;
+    &lt;tns:SprzedazWiersz&gt;
+      &lt;tns:LpSprzedazy&gt;6&lt;/tns:LpSprzedazy&gt;
+      &lt;tns:NrKontrahenta&gt;9591579231&lt;/tns:NrKontrahenta&gt;
+      &lt;tns:NazwaKontrahenta&gt;51102027330000220201029073 BPKOPLPW | PLN Błażej Stępień CARBON&lt;/tns:NazwaKontrahenta&gt;
+      &lt;tns:DowodSprzedazy&gt;11/02/2026&lt;/tns:DowodSprzedazy&gt;
+      &lt;tns:DataWystawienia&gt;2026-02-05&lt;/tns:DataWystawienia&gt;
+      &lt;tns:GTU_12&gt;1&lt;/tns:GTU_12&gt;
+      &lt;tns:K_19&gt;300.00&lt;/tns:K_19&gt;
+      &lt;tns:K_20&gt;69.00&lt;/tns:K_20&gt;
+    &lt;/tns:SprzedazWiersz&gt;
+    &lt;tns:SprzedazWiersz&gt;
+      &lt;tns:LpSprzedazy&gt;7&lt;/tns:LpSprzedazy&gt;
+      &lt;tns:NrKontrahenta&gt;9590892032&lt;/tns:NrKontrahenta&gt;
+      &lt;tns:NazwaKontrahenta&gt;Konto: 51 1020 2733 0000 2202 0102 9073 Bank: PKO Bank Polski S.A.&lt;/tns:NazwaKontrahenta&gt;
+      &lt;tns:DowodSprzedazy&gt;9/02/2026&lt;/tns:DowodSprzedazy&gt;
+      &lt;tns:DataWystawienia&gt;2026-02-01&lt;/tns:DataWystawienia&gt;
+      &lt;tns:GTU_12&gt;1&lt;/tns:GTU_12&gt;
+      &lt;tns:K_19&gt;440.00&lt;/tns:K_19&gt;
+      &lt;tns:K_20&gt;101.20&lt;/tns:K_20&gt;
+    &lt;/tns:SprzedazWiersz&gt;
+    &lt;tns:SprzedazWiersz&gt;
+      &lt;tns:LpSprzedazy&gt;8&lt;/tns:LpSprzedazy&gt;
+      &lt;tns:NrKontrahenta&gt;6572050491&lt;/tns:NrKontrahenta&gt;
+      &lt;tns:NazwaKontrahenta&gt;Konto: 51 1020 2733 0000 2202 0102 9073 Bank: PKO Bank Polski S.A.&lt;/tns:NazwaKontrahenta&gt;
+      &lt;tns:DowodSprzedazy&gt;8/02/2026&lt;/tns:DowodSprzedazy&gt;
+      &lt;tns:DataWystawienia&gt;2026-02-01&lt;/tns:DataWystawienia&gt;
+      &lt;tns:GTU_12&gt;1&lt;/tns:GTU_12&gt;
+      &lt;tns:K_19&gt;600.00&lt;/tns:K_19&gt;
+      &lt;tns:K_20&gt;138.00&lt;/tns:K_20&gt;
+    &lt;/tns:SprzedazWiersz&gt;
+    &lt;tns:SprzedazWiersz&gt;
+      &lt;tns:LpSprzedazy&gt;9&lt;/tns:LpSprzedazy&gt;
+      &lt;tns:NrKontrahenta&gt;6561907806&lt;/tns:NrKontrahenta&gt;
+      &lt;tns:NazwaKontrahenta&gt;Konto: 51 1020 2733 0000 2202 0102 9073 Bank: PKO Bank Polski S.A.&lt;/tns:NazwaKontrahenta&gt;
+      &lt;tns:DowodSprzedazy&gt;7/02/2026&lt;/tns:DowodSprzedazy&gt;
+      &lt;tns:DataWystawienia&gt;2026-02-01&lt;/tns:DataWystawienia&gt;
+      &lt;tns:GTU_12&gt;1&lt;/tns:GTU_12&gt;
+      &lt;tns:K_19&gt;380.00&lt;/tns:K_19&gt;
+      &lt;tns:K_20&gt;87.40&lt;/tns:K_20&gt;
+    &lt;/tns:SprzedazWiersz&gt;
+    &lt;tns:SprzedazWiersz&gt;
+      &lt;tns:LpSprzedazy&gt;10&lt;/tns:LpSprzedazy&gt;
+      &lt;tns:NrKontrahenta&gt;6561002040&lt;/tns:NrKontrahenta&gt;
+      &lt;tns:NazwaKontrahenta&gt;Konto: 51 1020 2733 0000 2202 0102 9073 Bank: PKO Bank Polski S.A.&lt;/tns:NazwaKontrahenta&gt;
+      &lt;tns:DowodSprzedazy&gt;6/02/2026&lt;/tns:DowodSprzedazy&gt;
+      &lt;tns:DataWystawienia&gt;2026-02-01&lt;/tns:DataWystawienia&gt;
+      &lt;tns:GTU_12&gt;1&lt;/tns:GTU_12&gt;
+      &lt;tns:K_19&gt;406.50&lt;/tns:K_19&gt;
+      &lt;tns:K_20&gt;93.50&lt;/tns:K_20&gt;
+    &lt;/tns:SprzedazWiersz&gt;
+    &lt;tns:SprzedazWiersz&gt;
+      &lt;tns:LpSprzedazy&gt;11&lt;/tns:LpSprzedazy&gt;
+      &lt;tns:NrKontrahenta&gt;6561080488&lt;/tns:NrKontrahenta&gt;
+      &lt;tns:NazwaKontrahenta&gt;Konto: 51 1020 2733 0000 2202 0102 9073 Bank: PKO Bank Polski S.A.&lt;/tns:NazwaKontrahenta&gt;
+      &lt;tns:DowodSprzedazy&gt;5/02/2026&lt;/tns:DowodSprzedazy&gt;
+      &lt;tns:DataWystawienia&gt;2026-02-01&lt;/tns:DataWystawienia&gt;
+      &lt;tns:GTU_12&gt;1&lt;/tns:GTU_12&gt;
+      &lt;tns:K_19&gt;245.00&lt;/tns:K_19&gt;
+      &lt;tns:K_20&gt;56.35&lt;/tns:K_20&gt;
+    &lt;/tns:SprzedazWiersz&gt;
+    &lt;tns:SprzedazWiersz&gt;
+      &lt;tns:LpSprzedazy&gt;12&lt;/tns:LpSprzedazy&gt;
+      &lt;tns:NrKontrahenta&gt;6562302324&lt;/tns:NrKontrahenta&gt;
+      &lt;tns:NazwaKontrahenta&gt;Konto: 51 1020 2733 0000 2202 0102 9073 Bank: PKO Bank Polski S.A.&lt;/tns:NazwaKontrahenta&gt;
+      &lt;tns:DowodSprzedazy&gt;4/02/2026&lt;/tns:DowodSprzedazy&gt;
+      &lt;tns:DataWystawienia&gt;2026-02-01&lt;/tns:DataWystawienia&gt;
+      &lt;tns:GTU_12&gt;1&lt;/tns:GTU_12&gt;
+      &lt;tns:K_19&gt;400.00&lt;/tns:K_19&gt;
+      &lt;tns:K_20&gt;92.00&lt;/tns:K_20&gt;
+    &lt;/tns:SprzedazWiersz&gt;
+    &lt;tns:SprzedazWiersz&gt;
+      &lt;tns:LpSprzedazy&gt;13&lt;/tns:LpSprzedazy&gt;
+      &lt;tns:NrKontrahenta&gt;8111641048&lt;/tns:NrKontrahenta&gt;
+      &lt;tns:NazwaKontrahenta&gt;Konto: 51 1020 2733 0000 2202 0102 9073 Bank: PKO Bank Polski S.A.&lt;/tns:NazwaKontrahenta&gt;
+      &lt;tns:DowodSprzedazy&gt;2/02/2026&lt;/tns:DowodSprzedazy&gt;
+      &lt;tns:DataWystawienia&gt;2026-02-01&lt;/tns:DataWystawienia&gt;
+      &lt;tns:GTU_12&gt;1&lt;/tns:GTU_12&gt;
+      &lt;tns:K_19&gt;250.00&lt;/tns:K_19&gt;
+      &lt;tns:K_20&gt;57.50&lt;/tns:K_20&gt;
+    &lt;/tns:SprzedazWiersz&gt;
+    &lt;tns:SprzedazWiersz&gt;
+      &lt;tns:LpSprzedazy&gt;14&lt;/tns:LpSprzedazy&gt;
+      &lt;tns:NrKontrahenta&gt;8111723007&lt;/tns:NrKontrahenta&gt;
+      &lt;tns:NazwaKontrahenta&gt;Konto: 51 1020 2733 0000 2202 0102 9073 Bank: PKO Bank Polski S.A.&lt;/tns:NazwaKontrahenta&gt;
+      &lt;tns:DowodSprzedazy&gt;1/02/2026&lt;/tns:DowodSprzedazy&gt;
+      &lt;tns:DataWystawienia&gt;2026-02-01&lt;/tns:DataWystawienia&gt;
+      &lt;tns:GTU_12&gt;1&lt;/tns:GTU_12&gt;
+      &lt;tns:K_19&gt;245.00&lt;/tns:K_19&gt;
+      &lt;tns:K_20&gt;56.35&lt;/tns:K_20&gt;
+    &lt;/tns:SprzedazWiersz&gt;
+    &lt;tns:SprzedazCtrl&gt;
+      &lt;tns:LiczbaWierszySprzedazy&gt;14&lt;/tns:LiczbaWierszySprzedazy&gt;
+      &lt;tns:PodatekNalezny&gt;1165.55&lt;/tns:PodatekNalezny&gt;
+    &lt;/tns:SprzedazCtrl&gt;
+    &lt;tns:ZakupCtrl&gt;
+      &lt;tns:LiczbaWierszyZakupow&gt;0&lt;/tns:LiczbaWierszyZakupow&gt;
+      &lt;tns:PodatekNaliczony&gt;0.00&lt;/tns:PodatekNaliczony&gt;
+    &lt;/tns:ZakupCtrl&gt;
+  &lt;/tns:Ewidencja&gt;
+&lt;/tns:JPK&gt;
+</textarea>
+            <div class="hint">
+                Skopiuj treść do pliku z rozszerzeniem <strong>.xml</strong> i zweryfikuj go w narzędziu MF lub swoim systemie księgowym.
+            </div>
+        </div>
+    </div>
+</body>
+</html>

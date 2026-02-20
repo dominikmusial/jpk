@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:JPK xmlns:etd="http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2021/06/08/eD/DefinicjeTypy/" xmlns:tns="http://crd.gov.pl/wzor/2021/12/27/11148/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <tns:Naglowek>
+    <tns:KodFormularza kodSystemowy="JPK_V7M (2)" wersjaSchemy="1-0E">JPK_VAT</tns:KodFormularza>
+    <tns:WariantFormularza>2</tns:WariantFormularza>
+    <tns:DataWytworzeniaJPK>2026-01-30T12:24:08Z</tns:DataWytworzeniaJPK>
+    <tns:NazwaSystemu>Fakturownia</tns:NazwaSystemu>
+    <tns:CelZlozenia poz="P_7">1</tns:CelZlozenia>
+    <tns:KodUrzedu>2603</tns:KodUrzedu>
+    <tns:Rok>2026</tns:Rok>
+    <tns:Miesiac>1</tns:Miesiac>
+  </tns:Naglowek>
+  <tns:Podmiot1 rola="Podatnik">
+    <tns:OsobaFizyczna>
+      <etd:NIP>6562276928</etd:NIP>
+      <etd:ImiePierwsze>Dominik</etd:ImiePierwsze>
+      <etd:Nazwisko>Musiał</etd:Nazwisko>
+      <etd:DataUrodzenia>1989-07-13</etd:DataUrodzenia>
+      <tns:Email>dominik.musial1989@gmail.com</tns:Email>
+      <tns:Telefon>512736370</tns:Telefon>
+    </tns:OsobaFizyczna>
+  </tns:Podmiot1>
+  <tns:Deklaracja>
+    <tns:Naglowek>
+      <tns:KodFormularzaDekl kodSystemowy="VAT-7 (22)" kodPodatku="VAT" rodzajZobowiazania="Z" wersjaSchemy="1-0E">VAT-7</tns:KodFormularzaDekl>
+      <tns:WariantFormularzaDekl>22</tns:WariantFormularzaDekl>
+    </tns:Naglowek>
+    <tns:PozycjeSzczegolowe>
+      <tns:P_19>14834</tns:P_19>
+      <tns:P_20>3412</tns:P_20>
+      <tns:P_37>14834</tns:P_37>
+      <tns:P_38>3412</tns:P_38>
+      <tns:P_51>3412</tns:P_51>
+    </tns:PozycjeSzczegolowe>
+    <tns:Pouczenia>1</tns:Pouczenia>
+  </tns:Deklaracja>
+  <tns:Ewidencja>
+    <tns:SprzedazWiersz>
+      <tns:LpSprzedazy>1</tns:LpSprzedazy>
+      <tns:NrKontrahenta>8111723007</tns:NrKontrahenta>
+      <tns:NazwaKontrahenta>Karol Kosmala "NATI"</tns:NazwaKontrahenta>
+      <tns:DowodSprzedazy>1/01/2026</tns:DowodSprzedazy>
+      <tns:DataWystawienia>2026-01-02</tns:DataWystawienia>
+      <tns:GTU_12>1</tns:GTU_12>
+      <tns:K_19>245.00</tns:K_19>
+      <tns:K_20>56.35</tns:K_20>
+    </tns:SprzedazWiersz>
+    <tns:SprzedazWiersz>
+      <tns:LpSprzedazy>2</tns:LpSprzedazy>
+      <tns:NrKontrahenta>8111641048</tns:NrKontrahenta>
+      <tns:NazwaKontrahenta>MARSTAL MARIUSZ SUCHECKI</tns:NazwaKontrahenta>
+      <tns:DowodSprzedazy>2/01/2026</tns:DowodSprzedazy>
+      <tns:DataWystawienia>2026-01-02</tns:DataWystawienia>
+      <tns:GTU_12>1</tns:GTU_12>
+      <tns:K_19>250.00</tns:K_19>
+      <tns:K_20>57.50</tns:K_20>
+    </tns:SprzedazWiersz>
+    <tns:SprzedazWiersz>
+      <tns:LpSprzedazy>3</tns:LpSprzedazy>
+      <tns:NrKontrahenta>7991262873</tns:NrKontrahenta>
+      <tns:NazwaKontrahenta>PRZEDSIĘBIORSTWO PRODUKCYJNO- HANDLOWO-USŁUGOWO-TRANSPORTOWE GRZEGORZ KWIECIEŃ</tns:NazwaKontrahenta>
+      <tns:DowodSprzedazy>3/01/2026</tns:DowodSprzedazy>
+      <tns:DataWystawienia>2026-01-02</tns:DataWystawienia>
+      <tns:GTU_12>1</tns:GTU_12>
+      <tns:K_19>1200.00</tns:K_19>
+      <tns:K_20>276.00</tns:K_20>
+    </tns:SprzedazWiersz>
+    <tns:SprzedazWiersz>
+      <tns:LpSprzedazy>4</tns:LpSprzedazy>
+      <tns:NrKontrahenta>6562302324</tns:NrKontrahenta>
+      <tns:NazwaKontrahenta>FB-U KAMARBUD S.C. MARCIN WOŹNIAK, KAROL PIOTROWSKI</tns:NazwaKontrahenta>
+      <tns:DowodSprzedazy>4/01/2026</tns:DowodSprzedazy>
+      <tns:DataWystawienia>2026-01-02</tns:DataWystawienia>
+      <tns:GTU_12>1</tns:GTU_12>
+      <tns:K_19>400.00</tns:K_19>
+      <tns:K_20>92.00</tns:K_20>
+    </tns:SprzedazWiersz>
+    <tns:SprzedazWiersz>
+      <tns:LpSprzedazy>5</tns:LpSprzedazy>
+      <tns:NrKontrahenta>6561080488</tns:NrKontrahenta>
+      <tns:NazwaKontrahenta>DACH SYSTEM Ulatowski Hubert</tns:NazwaKontrahenta>
+      <tns:DowodSprzedazy>5/01/2026</tns:DowodSprzedazy>
+      <tns:DataWystawienia>2026-01-02</tns:DataWystawienia>
+      <tns:GTU_12>1</tns:GTU_12>
+      <tns:K_19>245.00</tns:K_19>
+      <tns:K_20>56.35</tns:K_20>
+    </tns:SprzedazWiersz>
+    <tns:SprzedazWiersz>
+      <tns:LpSprzedazy>6</tns:LpSprzedazy>
+      <tns:NrKontrahenta>6561002040</tns:NrKontrahenta>
+      <tns:NazwaKontrahenta>Paweł Skóra Krawieckie Przedsiębiorstwo Produkcyjno-Handlowe "MARTEX"</tns:NazwaKontrahenta>
+      <tns:DowodSprzedazy>6/01/2026</tns:DowodSprzedazy>
+      <tns:DataWystawienia>2026-01-02</tns:DataWystawienia>
+      <tns:GTU_12>1</tns:GTU_12>
+      <tns:K_19>813.01</tns:K_19>
+      <tns:K_20>186.99</tns:K_20>
+    </tns:SprzedazWiersz>
+    <tns:SprzedazWiersz>
+      <tns:LpSprzedazy>7</tns:LpSprzedazy>
+      <tns:NrKontrahenta>6561907806</tns:NrKontrahenta>
+      <tns:NazwaKontrahenta>BUTIK EVA Ewa Pawlik</tns:NazwaKontrahenta>
+      <tns:DowodSprzedazy>7/01/2026</tns:DowodSprzedazy>
+      <tns:DataWystawienia>2026-01-02</tns:DataWystawienia>
+      <tns:GTU_12>1</tns:GTU_12>
+      <tns:K_19>380.00</tns:K_19>
+      <tns:K_20>87.40</tns:K_20>
+    </tns:SprzedazWiersz>
+    <tns:SprzedazWiersz>
+      <tns:LpSprzedazy>8</tns:LpSprzedazy>
+      <tns:NrKontrahenta>6572050491</tns:NrKontrahenta>
+      <tns:NazwaKontrahenta>HOL TRANS POMOC DROGOWA WOJCIECH KULIK</tns:NazwaKontrahenta>
+      <tns:DowodSprzedazy>8/01/2026</tns:DowodSprzedazy>
+      <tns:DataWystawienia>2026-01-02</tns:DataWystawienia>
+      <tns:GTU_12>1</tns:GTU_12>
+      <tns:K_19>600.00</tns:K_19>
+      <tns:K_20>138.00</tns:K_20>
+    </tns:SprzedazWiersz>
+    <tns:SprzedazWiersz>
+      <tns:LpSprzedazy>9</tns:LpSprzedazy>
+      <tns:NrKontrahenta>9590892032</tns:NrKontrahenta>
+      <tns:NazwaKontrahenta>ANNA ROGULA PPHU "LiW'</tns:NazwaKontrahenta>
+      <tns:DowodSprzedazy>9/01/2026</tns:DowodSprzedazy>
+      <tns:DataWystawienia>2026-01-02</tns:DataWystawienia>
+      <tns:GTU_12>1</tns:GTU_12>
+      <tns:K_19>440.00</tns:K_19>
+      <tns:K_20>101.20</tns:K_20>
+    </tns:SprzedazWiersz>
+    <tns:SprzedazWiersz>
+      <tns:LpSprzedazy>10</tns:LpSprzedazy>
+      <tns:NrKontrahenta>6621000583</tns:NrKontrahenta>
+      <tns:NazwaKontrahenta>VIKBUD WIESŁAW MŁYŃCZAK</tns:NazwaKontrahenta>
+      <tns:DowodSprzedazy>10/01/2026</tns:DowodSprzedazy>
+      <tns:DataWystawienia>2026-01-02</tns:DataWystawienia>
+      <tns:GTU_12>1</tns:GTU_12>
+      <tns:K_19>100.00</tns:K_19>
+      <tns:K_20>23.00</tns:K_20>
+    </tns:SprzedazWiersz>
+    <tns:SprzedazWiersz>
+      <tns:LpSprzedazy>11</tns:LpSprzedazy>
+      <tns:NrKontrahenta>6562342045</tns:NrKontrahenta>
+      <tns:NazwaKontrahenta>BEBEL GROUP SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ</tns:NazwaKontrahenta>
+      <tns:DowodSprzedazy>11/01/2026</tns:DowodSprzedazy>
+      <tns:DataWystawienia>2026-01-07</tns:DataWystawienia>
+      <tns:GTU_12>1</tns:GTU_12>
+      <tns:K_19>290.80</tns:K_19>
+      <tns:K_20>66.89</tns:K_20>
+    </tns:SprzedazWiersz>
+    <tns:SprzedazWiersz>
+      <tns:LpSprzedazy>12</tns:LpSprzedazy>
+      <tns:NrKontrahenta>9191840602</tns:NrKontrahenta>
+      <tns:NazwaKontrahenta>VAUTOMATE SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ</tns:NazwaKontrahenta>
+      <tns:DowodSprzedazy>12/01/2026</tns:DowodSprzedazy>
+      <tns:DataWystawienia>2026-01-07</tns:DataWystawienia>
+      <tns:GTU_12>1</tns:GTU_12>
+      <tns:K_19>3285.00</tns:K_19>
+      <tns:K_20>755.55</tns:K_20>
+    </tns:SprzedazWiersz>
+    <tns:SprzedazWiersz>
+      <tns:LpSprzedazy>13</tns:LpSprzedazy>
+      <tns:NrKontrahenta>9592066025</tns:NrKontrahenta>
+      <tns:NazwaKontrahenta>EUROUTIL SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ</tns:NazwaKontrahenta>
+      <tns:DowodSprzedazy>13/01/2026</tns:DowodSprzedazy>
+      <tns:DataWystawienia>2026-01-09</tns:DataWystawienia>
+      <tns:GTU_12>1</tns:GTU_12>
+      <tns:K_19>400.00</tns:K_19>
+      <tns:K_20>92.00</tns:K_20>
+    </tns:SprzedazWiersz>
+    <tns:SprzedazWiersz>
+      <tns:LpSprzedazy>14</tns:LpSprzedazy>
+      <tns:NrKontrahenta>6562200262</tns:NrKontrahenta>
+      <tns:NazwaKontrahenta>"AUTOSERWIS" BIK I WSPÓLNICY SŁAWOMIR BIK,ADAM BIK</tns:NazwaKontrahenta>
+      <tns:DowodSprzedazy>14/01/2026</tns:DowodSprzedazy>
+      <tns:DataWystawienia>2026-01-14</tns:DataWystawienia>
+      <tns:K_19>150.00</tns:K_19>
+      <tns:K_20>34.50</tns:K_20>
+    </tns:SprzedazWiersz>
+    <tns:SprzedazWiersz>
+      <tns:LpSprzedazy>15</tns:LpSprzedazy>
+      <tns:NrKontrahenta>6631708042</tns:NrKontrahenta>
+      <tns:NazwaKontrahenta>BIURO PROJEKTOWE "DART PROJEKT" ARTUR DOROBCZYŃSKI</tns:NazwaKontrahenta>
+      <tns:DowodSprzedazy>15/01/2026</tns:DowodSprzedazy>
+      <tns:DataWystawienia>2026-01-14</tns:DataWystawienia>
+      <tns:GTU_12>1</tns:GTU_12>
+      <tns:K_19>253.00</tns:K_19>
+      <tns:K_20>58.19</tns:K_20>
+    </tns:SprzedazWiersz>
+    <tns:SprzedazWiersz>
+      <tns:LpSprzedazy>16</tns:LpSprzedazy>
+      <tns:NrKontrahenta>6562241373</tns:NrKontrahenta>
+      <tns:NazwaKontrahenta>JK-Bud Jarosław Kot</tns:NazwaKontrahenta>
+      <tns:DowodSprzedazy>16/01/2026</tns:DowodSprzedazy>
+      <tns:DataWystawienia>2026-01-17</tns:DataWystawienia>
+      <tns:K_19>120.00</tns:K_19>
+      <tns:K_20>27.60</tns:K_20>
+    </tns:SprzedazWiersz>
+    <tns:SprzedazWiersz>
+      <tns:LpSprzedazy>17</tns:LpSprzedazy>
+      <tns:NrKontrahenta>BRAK</tns:NrKontrahenta>
+      <tns:NazwaKontrahenta>Krzysztof  Sadowski</tns:NazwaKontrahenta>
+      <tns:DowodSprzedazy>17/01/2026</tns:DowodSprzedazy>
+      <tns:DataWystawienia>2026-01-19</tns:DataWystawienia>
+      <tns:GTU_12>1</tns:GTU_12>
+      <tns:K_19>3333.33</tns:K_19>
+      <tns:K_20>766.67</tns:K_20>
+    </tns:SprzedazWiersz>
+    <tns:SprzedazWiersz>
+      <tns:LpSprzedazy>18</tns:LpSprzedazy>
+      <tns:NrKontrahenta>5732928023</tns:NrKontrahenta>
+      <tns:NazwaKontrahenta>7INFINITY.PL SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ</tns:NazwaKontrahenta>
+      <tns:DowodSprzedazy>18/01/2026</tns:DowodSprzedazy>
+      <tns:DataWystawienia>2026-01-21</tns:DataWystawienia>
+      <tns:GTU_12>1</tns:GTU_12>
+      <tns:K_19>1620.00</tns:K_19>
+      <tns:K_20>372.60</tns:K_20>
+    </tns:SprzedazWiersz>
+    <tns:SprzedazWiersz>
+      <tns:LpSprzedazy>19</tns:LpSprzedazy>
+      <tns:KodKrajuNadaniaTIN>PL</tns:KodKrajuNadaniaTIN>
+      <tns:NrKontrahenta>6562356389</tns:NrKontrahenta>
+      <tns:NazwaKontrahenta>A&amp;D WORKWEAR SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ</tns:NazwaKontrahenta>
+      <tns:DowodSprzedazy>19/01/2026</tns:DowodSprzedazy>
+      <tns:DataWystawienia>2026-01-30</tns:DataWystawienia>
+      <tns:GTU_12>1</tns:GTU_12>
+      <tns:K_19>708.50</tns:K_19>
+      <tns:K_20>162.96</tns:K_20>
+    </tns:SprzedazWiersz>
+    <tns:SprzedazCtrl>
+      <tns:LiczbaWierszySprzedazy>19</tns:LiczbaWierszySprzedazy>
+      <tns:PodatekNalezny>3411.75</tns:PodatekNalezny>
+    </tns:SprzedazCtrl>
+    <tns:ZakupCtrl>
+      <tns:LiczbaWierszyZakupow>0</tns:LiczbaWierszyZakupow>
+      <tns:PodatekNaliczony>0.00</tns:PodatekNaliczony>
+    </tns:ZakupCtrl>
+  </tns:Ewidencja>
+</tns:JPK>
