@@ -953,10 +953,31 @@ $phone = $_POST['phone'] ?? '512736370';
 $action = $_POST['action'] ?? 'preview';
 
 if (($_SERVER['REQUEST_METHOD'] ?? null) === 'POST' && $action === 'run_worker') {
-    $php = escapeshellarg(PHP_BINARY);
-    $script = escapeshellarg(__FILE__);
-    $cmd = $php . ' ' . $script . ' worker > /dev/null 2>&1 &';
-    @exec($cmd);
+    $executedInBackground = false;
+
+    if (function_exists('exec')) {
+        $php = escapeshellarg(PHP_BINARY);
+        $script = escapeshellarg(__FILE__);
+        $cmd = $php . ' ' . $script . ' worker > /dev/null 2>&1 &';
+        @exec($cmd, $out, $code);
+
+        if (!isset($code) || $code === 0) {
+            $executedInBackground = true;
+        }
+    }
+
+    if (!$executedInBackground) {
+        ignore_user_abort(true);
+
+        if (function_exists('fastcgi_finish_request')) {
+            fastcgi_finish_request();
+        } else {
+            @ob_end_flush();
+            @flush();
+        }
+
+        jpkRunWorker();
+    }
 }
 
 if (($_SERVER['REQUEST_METHOD'] ?? null) === 'POST') {
