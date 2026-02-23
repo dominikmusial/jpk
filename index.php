@@ -94,6 +94,7 @@ function parseInvoicesFromPdf(string $filePath, string $companyNip): array
         'gross_amount' => null,
         'currency' => 'PLN',
         'buyer_name' => null,
+        'seller_name' => null,
     ];
 
     if (!is_readable($filePath)) {
@@ -168,6 +169,7 @@ function extractInvoiceDataFromText(string $text, string $companyNip): array
         'gross_amount' => null,
         'currency' => 'PLN',
         'buyer_name' => null,
+        'seller_name' => null,
     ];
 
     if (preg_match('/Faktura\s+numer[:\s]*([^\r\n]+)/iu', $text, $m)) {
@@ -176,15 +178,15 @@ function extractInvoiceDataFromText(string $text, string $companyNip): array
         $data['invoice_number'] = trim($m[1]);
     }
 
-    if (preg_match('/Data\s+wystawienia:\s*[^\d\r\n]*?(\d{4}-\d{2}-\d{2})/u', $text, $m)) {
+    if (preg_match('/Data\s+wystawienia:\s*[^\d\r\n]*?(\d{4}-\d{2}-\d{2})/iu', $text, $m)) {
         $data['issue_date'] = $m[1];
     }
 
-    if (preg_match('/Data\s+sprzedaży[:\s]*([0-9]{4}-[0-9]{2}-[0-9]{2})/u', $text, $m)) {
+    if (preg_match('/Data\s+sprzedaży[:\s]*([0-9]{4}-[0-9]{2}-[0-9]{2})/iu', $text, $m)) {
         $data['sell_date'] = $m[1];
     } elseif (
         preg_match(
-            '/Data\s+faktury\/Data\s+dostawy:\s*([0-9]{1,2})\s+([^\s]+)\s+([0-9]{4})/u',
+            '/Data\s+faktury\/Data\s+dostawy:\s*([0-9]{1,2})\s+([^\s]+)\s+([0-9]{4})/iu',
             $text,
             $m
         )
@@ -268,7 +270,16 @@ function extractInvoiceDataFromText(string $text, string $companyNip): array
         if ($name !== null) {
             $data['buyer_name'] = $name;
         }
-    } elseif (preg_match('/Sprzedane\s+przez:\s*(.+)/u', $text, $m)) {
+    }
+
+    if ($data['seller_name'] === null && preg_match('/Sprzedane\s+przez:\s*(.+)/u', $text, $m)) {
+        $data['seller_name'] = trim($m[1]);
+    }
+
+    if (
+        $data['buyer_name'] === null &&
+        preg_match('/Adres\s+do\s+wysyłki\s*(?:\R+)([^\r\n]+)/u', $text, $m)
+    ) {
         $data['buyer_name'] = trim($m[1]);
     }
 
@@ -286,6 +297,17 @@ function extractInvoiceDataFromText(string $text, string $companyNip): array
         $data['gross_amount'] = str_replace(',', '.', $m[1]);
     }
 
+    if (
+        $data['gross_amount'] === null &&
+        preg_match(
+            '/Suma\s+na\s+fakturze(?:\s+VAT)?[:\s]+([0-9]+,[0-9]{2})\s*z[łt]/u',
+            $text,
+            $m
+        )
+    ) {
+        $data['gross_amount'] = str_replace(',', '.', $m[1]);
+    }
+
     if (preg_match('/W tym\s+[0-9]+,[0-9]{2}\s+([0-9]{1,2})\s+[0-9]+,[0-9]{2}\s+[0-9]+,[0-9]{2}/u', $text, $m)) {
         $data['vat_rate'] = $m[1];
     }
@@ -294,13 +316,29 @@ function extractInvoiceDataFromText(string $text, string $companyNip): array
         $data['net_amount'] === null &&
         $data['vat_amount'] === null &&
         preg_match(
-            '/Stawka\s+VAT.*?Suma:\s*([0-9]+,[0-9]{2})\s*zł\s+([0-9]+,[0-9]{2})\s*zł/Us',
+            '/Stawka\s+VAT.*?Suma:\s*([0-9]+,[0-9]{2})\s*z[łt]\s+([0-9]+,[0-9]{2})\s*z[łt]/Us',
             $text,
             $m
         )
     ) {
         $data['net_amount'] = str_replace(',', '.', $m[1]);
         $data['vat_amount'] = str_replace(',', '.', $m[2]);
+    }
+
+    if (
+        $data['net_amount'] === null &&
+        $data['vat_amount'] === null &&
+        preg_match_all(
+            '/([0-9]{1,2})%\s+([0-9]+,[0-9]{2})\s*z[łt]\s+([0-9]+,[0-9]{2})\s*z[łt]/u',
+            $text,
+            $matches,
+            PREG_SET_ORDER
+        )
+    ) {
+        $last = end($matches);
+        $data['vat_rate'] = $last[1];
+        $data['net_amount'] = str_replace(',', '.', $last[2]);
+        $data['vat_amount'] = str_replace(',', '.', $last[3]);
     }
 
     if ($data['gross_amount'] !== null) {
@@ -548,8 +586,7 @@ function generateJpkFaXml(array $invoices, array $meta): string
     $etd = 'http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2021/06/08/eD/DefinicjeTypy/';
     $xsi = 'http://www.w3.org/2001/XMLSchema-instance';
 
-    $jpk = $dom->createElementNS($tns, 'tns:JPK');
-    $jpk->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:tns', $tns);
+    $jpk = $dom->createElementNS($tns, 'JPK');
     $jpk->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:etd', $etd);
     $jpk->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:xsi', $xsi);
 
@@ -558,79 +595,78 @@ function generateJpkFaXml(array $invoices, array $meta): string
     $year = substr((string)$periodDate, 0, 4);
     $month = substr((string)$periodDate, 5, 2);
 
-    $naglowek = $dom->createElementNS($tns, 'tns:Naglowek');
-    $kodForm = $dom->createElementNS($tns, 'tns:KodFormularza', 'JPK_VAT');
+    $naglowek = $dom->createElementNS($tns, 'Naglowek');
+    $kodForm = $dom->createElementNS($tns, 'KodFormularza', 'JPK_VAT');
     $kodForm->setAttribute('kodSystemowy', 'JPK_V7M (2)');
     $kodForm->setAttribute('wersjaSchemy', '1-0E');
     $naglowek->appendChild($kodForm);
-    $naglowek->appendChild($dom->createElementNS($tns, 'tns:WariantFormularza', '2'));
-    $naglowek->appendChild($dom->createElementNS($tns, 'tns:DataWytworzeniaJPK', gmdate('Y-m-d\TH:i:s\Z')));
-    $naglowek->appendChild($dom->createElementNS($tns, 'tns:NazwaSystemu', 'PDF2JPK'));
+    $naglowek->appendChild($dom->createElementNS($tns, 'WariantFormularza', '2'));
+    $naglowek->appendChild($dom->createElementNS($tns, 'DataWytworzeniaJPK', gmdate('Y-m-d\TH:i:s\Z')));
+    $naglowek->appendChild($dom->createElementNS($tns, 'NazwaSystemu', 'PDF2JPK'));
 
-    $cel = $dom->createElementNS($tns, 'tns:CelZlozenia', (string)($meta['purpose'] ?? 1));
+    $cel = $dom->createElementNS($tns, 'CelZlozenia', (string)($meta['purpose'] ?? 1));
     $cel->setAttribute('poz', 'P_7');
     $naglowek->appendChild($cel);
 
-    $naglowek->appendChild($dom->createElementNS($tns, 'tns:KodUrzedu', $meta['office_code'] ?? '2603'));
-    $naglowek->appendChild($dom->createElementNS($tns, 'tns:Rok', (string)$year));
-    $naglowek->appendChild($dom->createElementNS($tns, 'tns:Miesiac', ltrim((string)$month, '0')));
+    $naglowek->appendChild($dom->createElementNS($tns, 'KodUrzedu', $meta['office_code'] ?? '2603'));
+    $naglowek->appendChild($dom->createElementNS($tns, 'Rok', (string)$year));
+    $naglowek->appendChild($dom->createElementNS($tns, 'Miesiac', ltrim((string)$month, '0')));
 
     $jpk->appendChild($naglowek);
 
-    $podmiot = $dom->createElementNS($tns, 'tns:Podmiot1');
+    $podmiot = $dom->createElementNS($tns, 'Podmiot1');
     $podmiot->setAttribute('rola', 'Podatnik');
 
-    $osoba = $dom->createElementNS($tns, 'tns:OsobaFizyczna');
+    $osoba = $dom->createElementNS($tns, 'OsobaFizyczna');
     $osoba->appendChild($dom->createElementNS($etd, 'etd:NIP', $meta['seller_nip'] ?? $first['seller_nip'] ?? ''));
     $osoba->appendChild($dom->createElementNS($etd, 'etd:ImiePierwsze', $meta['first_name'] ?? 'Dominik'));
     $osoba->appendChild($dom->createElementNS($etd, 'etd:Nazwisko', $meta['last_name'] ?? 'Musiał'));
     $osoba->appendChild($dom->createElementNS($etd, 'etd:DataUrodzenia', $meta['birth_date'] ?? '1989-07-13'));
-    $osoba->appendChild($dom->createElementNS($tns, 'tns:Email', $meta['email'] ?? 'dominik.musial1989@gmail.com'));
-    $osoba->appendChild($dom->createElementNS($tns, 'tns:Telefon', $meta['phone'] ?? '512736370'));
+    $osoba->appendChild($dom->createElementNS($tns, 'Email', $meta['email'] ?? 'dominik.musial1989@gmail.com'));
 
     $podmiot->appendChild($osoba);
     $jpk->appendChild($podmiot);
 
-    $deklaracja = $dom->createElementNS($tns, 'tns:Deklaracja');
-    $dekNaglowek = $dom->createElementNS($tns, 'tns:Naglowek');
-    $kodFormDekl = $dom->createElementNS($tns, 'tns:KodFormularzaDekl', 'VAT-7');
+    $deklaracja = $dom->createElementNS($tns, 'Deklaracja');
+    $dekNaglowek = $dom->createElementNS($tns, 'Naglowek');
+    $kodFormDekl = $dom->createElementNS($tns, 'KodFormularzaDekl', 'VAT-7');
     $kodFormDekl->setAttribute('kodSystemowy', 'VAT-7 (22)');
     $kodFormDekl->setAttribute('kodPodatku', 'VAT');
     $kodFormDekl->setAttribute('rodzajZobowiazania', 'Z');
     $kodFormDekl->setAttribute('wersjaSchemy', '1-0E');
     $dekNaglowek->appendChild($kodFormDekl);
-    $dekNaglowek->appendChild($dom->createElementNS($tns, 'tns:WariantFormularzaDekl', '22'));
+    $dekNaglowek->appendChild($dom->createElementNS($tns, 'WariantFormularzaDekl', '22'));
     $deklaracja->appendChild($dekNaglowek);
 
     $totalNet = 0.0;
     $totalVat = 0.0;
 
-    $ewidencja = $dom->createElementNS($tns, 'tns:Ewidencja');
+    $ewidencja = $dom->createElementNS($tns, 'Ewidencja');
 
     $lp = 1;
     foreach ($invoices as $invoice) {
-        $sprzedaz = $dom->createElementNS($tns, 'tns:SprzedazWiersz');
-        $sprzedaz->appendChild($dom->createElementNS($tns, 'tns:LpSprzedazy', (string)$lp));
+        $sprzedaz = $dom->createElementNS($tns, 'SprzedazWiersz');
+        $sprzedaz->appendChild($dom->createElementNS($tns, 'LpSprzedazy', (string)$lp));
 
         $buyerNip = $invoice['buyer_nip'] ?? 'BRAK';
-        $sprzedaz->appendChild($dom->createElementNS($tns, 'tns:NrKontrahenta', $buyerNip));
+        $sprzedaz->appendChild($dom->createElementNS($tns, 'NrKontrahenta', $buyerNip));
 
         $buyerName = $invoice['buyer_name'] ?? ($meta['buyer_name'] ?? 'Nabywca');
-        $sprzedaz->appendChild($dom->createElementNS($tns, 'tns:NazwaKontrahenta', $buyerName));
+        $sprzedaz->appendChild($dom->createElementNS($tns, 'NazwaKontrahenta', $buyerName));
 
         $number = $invoice['invoice_number'] ?? '';
-        $sprzedaz->appendChild($dom->createElementNS($tns, 'tns:DowodSprzedazy', $number));
+        $sprzedaz->appendChild($dom->createElementNS($tns, 'DowodSprzedazy', $number));
 
         $issueDate = $invoice['issue_date'] ?? '';
-        $sprzedaz->appendChild($dom->createElementNS($tns, 'tns:DataWystawienia', $issueDate));
+        $sprzedaz->appendChild($dom->createElementNS($tns, 'DataWystawienia', $issueDate));
 
-        $sprzedaz->appendChild($dom->createElementNS($tns, 'tns:GTU_12', '1'));
+        $sprzedaz->appendChild($dom->createElementNS($tns, 'GTU_12', '1'));
 
         $net = (float)($invoice['net_amount'] ?? 0);
         $vat = (float)($invoice['vat_amount'] ?? 0);
 
-        $sprzedaz->appendChild($dom->createElementNS($tns, 'tns:K_19', number_format($net, 2, '.', '')));
-        $sprzedaz->appendChild($dom->createElementNS($tns, 'tns:K_20', number_format($vat, 2, '.', '')));
+        $sprzedaz->appendChild($dom->createElementNS($tns, 'K_19', number_format($net, 2, '.', '')));
+        $sprzedaz->appendChild($dom->createElementNS($tns, 'K_20', number_format($vat, 2, '.', '')));
 
         $ewidencja->appendChild($sprzedaz);
 
@@ -640,25 +676,25 @@ function generateJpkFaXml(array $invoices, array $meta): string
         $lp++;
     }
 
-    $pozycje = $dom->createElementNS($tns, 'tns:PozycjeSzczegolowe');
-    $pozycje->appendChild($dom->createElementNS($tns, 'tns:P_19', number_format($totalNet, 2, '.', '')));
-    $pozycje->appendChild($dom->createElementNS($tns, 'tns:P_20', number_format($totalVat, 2, '.', '')));
-    $pozycje->appendChild($dom->createElementNS($tns, 'tns:P_37', number_format($totalNet, 2, '.', '')));
-    $pozycje->appendChild($dom->createElementNS($tns, 'tns:P_38', number_format($totalVat, 2, '.', '')));
-    $pozycje->appendChild($dom->createElementNS($tns, 'tns:P_51', number_format($totalVat, 2, '.', '')));
+    $pozycje = $dom->createElementNS($tns, 'PozycjeSzczegolowe');
+    $pozycje->appendChild($dom->createElementNS($tns, 'P_19', number_format($totalNet, 2, '.', '')));
+    $pozycje->appendChild($dom->createElementNS($tns, 'P_20', number_format($totalVat, 2, '.', '')));
+    $pozycje->appendChild($dom->createElementNS($tns, 'P_37', number_format($totalNet, 2, '.', '')));
+    $pozycje->appendChild($dom->createElementNS($tns, 'P_38', number_format($totalVat, 2, '.', '')));
+    $pozycje->appendChild($dom->createElementNS($tns, 'P_51', number_format($totalVat, 2, '.', '')));
     $deklaracja->appendChild($pozycje);
-    $deklaracja->appendChild($dom->createElementNS($tns, 'tns:Pouczenia', '1'));
+    $deklaracja->appendChild($dom->createElementNS($tns, 'Pouczenia', '1'));
 
     $jpk->appendChild($deklaracja);
 
-    $sprzedazCtrl = $dom->createElementNS($tns, 'tns:SprzedazCtrl');
-    $sprzedazCtrl->appendChild($dom->createElementNS($tns, 'tns:LiczbaWierszySprzedazy', (string)count($invoices)));
-    $sprzedazCtrl->appendChild($dom->createElementNS($tns, 'tns:PodatekNalezny', number_format($totalVat, 2, '.', '')));
+    $sprzedazCtrl = $dom->createElementNS($tns, 'SprzedazCtrl');
+    $sprzedazCtrl->appendChild($dom->createElementNS($tns, 'LiczbaWierszySprzedazy', (string)count($invoices)));
+    $sprzedazCtrl->appendChild($dom->createElementNS($tns, 'PodatekNalezny', number_format($totalVat, 2, '.', '')));
     $ewidencja->appendChild($sprzedazCtrl);
 
-    $zakupCtrl = $dom->createElementNS($tns, 'tns:ZakupCtrl');
-    $zakupCtrl->appendChild($dom->createElementNS($tns, 'tns:LiczbaWierszyZakupow', '0'));
-    $zakupCtrl->appendChild($dom->createElementNS($tns, 'tns:PodatekNaliczony', '0.00'));
+    $zakupCtrl = $dom->createElementNS($tns, 'ZakupCtrl');
+    $zakupCtrl->appendChild($dom->createElementNS($tns, 'LiczbaWierszyZakupow', '0'));
+    $zakupCtrl->appendChild($dom->createElementNS($tns, 'PodatekNaliczony', '0.00'));
     $ewidencja->appendChild($zakupCtrl);
 
     $jpk->appendChild($ewidencja);
@@ -671,13 +707,13 @@ function generateJpkFaXml(array $invoices, array $meta): string
 $xml = null;
 $error = null;
 $debugText = null;
-$companyName = $_POST['company_name'] ?? 'dajstrone.pl Dominik Musiał';
-$companyNip = $_POST['company_nip'] ?? '6562276928';
-$officeCode = $_POST['office_code'] ?? '1475';
-$firstName = $_POST['first_name'] ?? 'Dominik';
-$lastName = $_POST['last_name'] ?? 'Musiał';
-$birthDate = $_POST['birth_date'] ?? '1989-07-13';
-$email = $_POST['email'] ?? 'dominik.musial1989@gmail.com';
+$companyName = $_POST['company_name'] ?? 'Exclusive Kicks Krystian Gędłek';
+$companyNip = $_POST['company_nip'] ?? '6322033623';
+$officeCode = $_POST['office_code'] ?? '2415';
+$firstName = $_POST['first_name'] ?? 'Krystian';
+$lastName = $_POST['last_name'] ?? 'Gędłek';
+$birthDate = $_POST['birth_date'] ?? '2004-09-13';
+$email = $_POST['email'] ?? 'exclusive_kicks@wp.pl';
 $phone = $_POST['phone'] ?? '512736370';
 $action = $_POST['action'] ?? 'preview';
 
