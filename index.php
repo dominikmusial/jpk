@@ -704,6 +704,150 @@ function generateJpkFaXml(array $invoices, array $meta): string
     return $dom->saveXML();
 }
 
+function jpkJobsDir(): string
+{
+    return __DIR__ . '/jobs';
+}
+
+function loadJpkJobs(): array
+{
+    $jobsDir = jpkJobsDir();
+
+    if (!is_dir($jobsDir)) {
+        return [];
+    }
+
+    $jobs = [];
+
+    foreach (glob($jobsDir . '/*.json') ?: [] as $metaPath) {
+        $data = json_decode((string)file_get_contents($metaPath), true);
+
+        if (!is_array($data) || !isset($data['id'])) {
+            continue;
+        }
+
+        $jobs[] = $data;
+    }
+
+    usort($jobs, function (array $a, array $b): int {
+        $aTime = $a['created_at'] ?? '';
+        $bTime = $b['created_at'] ?? '';
+
+        return strcmp($bTime, $aTime);
+    });
+
+    return $jobs;
+}
+
+function jpkRunWorker(): void
+{
+    $jobsDir = jpkJobsDir();
+
+    if (!is_dir($jobsDir)) {
+        return;
+    }
+
+    $metaFiles = glob($jobsDir . '/*.json') ?: [];
+    sort($metaFiles);
+
+    foreach ($metaFiles as $metaPath) {
+        $raw = file_get_contents($metaPath);
+        $job = json_decode($raw !== false ? $raw : '', true);
+
+        if (!is_array($job) || ($job['status'] ?? '') !== 'pending') {
+            continue;
+        }
+
+        $jobId = (string)($job['id'] ?? pathinfo($metaPath, PATHINFO_FILENAME));
+        $jobDir = $jobsDir . '/' . $jobId;
+
+        if (!is_dir($jobDir)) {
+            $job['status'] = 'error';
+            $job['error'] = 'Brak katalogu z plikami dla zadania.';
+            file_put_contents($metaPath, json_encode($job, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+            continue;
+        }
+
+        $allInvoices = [];
+        $companyNip = (string)($job['meta']['company_nip'] ?? '');
+
+        foreach ($job['files'] as $fileInfo) {
+            $storedName = (string)($fileInfo['stored_name'] ?? '');
+            $originalName = (string)($fileInfo['original_name'] ?? '');
+
+            if ($storedName === '') {
+                continue;
+            }
+
+            $path = $jobDir . '/' . $storedName;
+
+            if (!is_readable($path)) {
+                continue;
+            }
+
+            $extSource = $originalName !== '' ? $originalName : $path;
+            $ext = strtolower(pathinfo($extSource, PATHINFO_EXTENSION));
+            $invoices = [];
+
+            if ($ext === 'pdf') {
+                $invoices = parseInvoicesFromPdf($path, $companyNip);
+            } elseif ($ext === 'csv') {
+                $invoices = parseInvoicesFromCsv($path, $companyNip);
+            } elseif ($ext === 'xml') {
+                $invoices = parseInvoicesFromJpkXml($path, $companyNip);
+            }
+
+            if (!empty($invoices)) {
+                $allInvoices = array_merge($allInvoices, $invoices);
+            }
+        }
+
+        if (empty($allInvoices)) {
+            $job['status'] = 'error';
+            $job['error'] = 'Nie udało się odczytać danych faktur dla zadania.';
+            file_put_contents($metaPath, json_encode($job, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+            continue;
+        }
+
+        $first = $allInvoices[0];
+
+        $meta = [
+            'purpose' => 1,
+            'period_from' => $first['sell_date'] ?? $first['issue_date'],
+            'period_to' => $first['sell_date'] ?? $first['issue_date'],
+            'office_code' => $job['meta']['office_code'] ?? '2603',
+            'seller_nip' => $companyNip,
+            'seller_name' => $job['meta']['company_name'] ?? '',
+            'buyer_name' => 'Nabywca',
+            'first_name' => $job['meta']['first_name'] ?? '',
+            'last_name' => $job['meta']['last_name'] ?? '',
+            'birth_date' => $job['meta']['birth_date'] ?? '',
+            'email' => $job['meta']['email'] ?? '',
+            'phone' => $job['meta']['phone'] ?? '',
+        ];
+
+        $xml = generateJpkFaXml($allInvoices, $meta);
+        $resultPath = $jobsDir . '/' . $jobId . '.xml';
+        file_put_contents($resultPath, $xml);
+
+        $job['status'] = 'done';
+        $job['result_file'] = 'jobs/' . $jobId . '.xml';
+        $job['error'] = null;
+        $job['updated_at'] = date('c');
+
+        file_put_contents($metaPath, json_encode($job, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+
+        if (defined('STDOUT')) {
+            fwrite(STDOUT, 'Przetworzono zadanie ' . $jobId . PHP_EOL);
+        }
+    }
+}
+
+if (PHP_SAPI === 'cli' && isset($argv[1]) && $argv[1] === 'worker') {
+    jpkRunWorker();
+    return;
+}
+
 set_time_limit(0);
 ini_set('memory_limit', '1024M');
 $xml = null;
@@ -720,9 +864,6 @@ $phone = $_POST['phone'] ?? '512736370';
 $action = $_POST['action'] ?? 'preview';
 
 if (($_SERVER['REQUEST_METHOD'] ?? null) === 'POST' && isset($_FILES['invoice_pdf'])) {
-    $allInvoices = [];
-    $rawText = '';
-
     $tmpNames = $_FILES['invoice_pdf']['tmp_name'] ?? [];
     $origNames = $_FILES['invoice_pdf']['name'] ?? [];
 
@@ -765,6 +906,20 @@ if (($_SERVER['REQUEST_METHOD'] ?? null) === 'POST' && isset($_FILES['invoice_pd
             $origNames = [$origNames];
         }
 
+        $jobsDir = jpkJobsDir();
+
+        if (!is_dir($jobsDir)) {
+            mkdir($jobsDir, 0777, true);
+        }
+
+        $jobId = date('Ymd-His') . '-' . bin2hex(random_bytes(4));
+        $jobDir = $jobsDir . '/' . $jobId;
+
+        if (!is_dir($jobDir)) {
+            mkdir($jobDir, 0777, true);
+        }
+
+        $storedFiles = [];
         $count = count($tmpNames);
 
         for ($i = 0; $i < $count; $i++) {
@@ -776,70 +931,50 @@ if (($_SERVER['REQUEST_METHOD'] ?? null) === 'POST' && isset($_FILES['invoice_pd
             }
 
             $ext = strtolower(pathinfo($origName, PATHINFO_EXTENSION));
-            $invoices = [];
 
-            if ($ext === 'pdf') {
-                $invoices = parseInvoicesFromPdf($tmpPath, $companyNip);
-                $rawText = $GLOBALS['last_pdf_text'] ?? $rawText;
-            } elseif ($ext === 'csv') {
-                $invoices = parseInvoicesFromCsv($tmpPath, $companyNip);
-            } elseif ($ext === 'xml') {
-                $invoices = parseInvoicesFromJpkXml($tmpPath, $companyNip);
+            if ($ext === '') {
+                $ext = 'dat';
             }
 
-            if (!empty($invoices)) {
-                $allInvoices = array_merge($allInvoices, $invoices);
+            $storedName = 'file-' . ($i + 1) . '.' . $ext;
+            $targetPath = $jobDir . '/' . $storedName;
+
+            if (!@move_uploaded_file($tmpPath, $targetPath)) {
+                continue;
             }
+
+            $storedFiles[] = [
+                'original_name' => $origName,
+                'stored_name' => $storedName,
+                'extension' => $ext,
+            ];
         }
 
-        if (empty($allInvoices)) {
-            if ($rawText !== '') {
-                $error = 'Nie udało się dopasować danych faktur do bieżących wzorców. Poniżej jest surowy tekst z PDF do analizy.';
-                $debugText = $rawText;
-            } else {
-                $error = 'Nie udało się odczytać danych faktur z żadnego pliku. Obsługiwane są PDF, CSV (raport VAT) oraz XML (JPK).';
-            }
+        if (empty($storedFiles)) {
+            $error = 'Nie udało się zapisać żadnego pliku do kolejki zadań.';
         } else {
-            $first = $allInvoices[0];
-
-            $meta = [
-                'purpose' => 1,
-                'period_from' => $first['sell_date'] ?? $first['issue_date'],
-                'period_to' => $first['sell_date'] ?? $first['issue_date'],
-                'office_code' => $officeCode,
-                'seller_nip' => $companyNip,
-                'seller_name' => $companyName,
-                'buyer_name' => 'Nabywca',
-                'first_name' => $firstName,
-                'last_name' => $lastName,
-                'birth_date' => $birthDate,
-                'email' => $email,
-                'phone' => $phone,
+            $job = [
+                'id' => $jobId,
+                'created_at' => date('c'),
+                'status' => 'pending',
+                'meta' => [
+                    'company_name' => $companyName,
+                    'company_nip' => $companyNip,
+                    'office_code' => $officeCode,
+                    'first_name' => $firstName,
+                    'last_name' => $lastName,
+                    'birth_date' => $birthDate,
+                    'email' => $email,
+                    'phone' => $phone,
+                ],
+                'files' => $storedFiles,
+                'result_file' => null,
+                'error' => null,
             ];
 
-            $invoiceData = $allInvoices;
-            $xml = generateJpkFaXml($allInvoices, $meta);
-
-            $_SESSION['last_jpk_xml'] = $xml;
-            $_SESSION['last_jpk_meta'] = $meta;
-
-            if ($action === 'download' && $error === null && $xml !== null) {
-                $baseDate = $meta['period_from'] ?? date('Y-m-d');
-                $safeDate = preg_replace('/[^0-9\-]/', '', (string)$baseDate);
-
-                if ($safeDate === '') {
-                    $safeDate = date('Y-m-d');
-                }
-
-                $fileName = 'jpk-' . $safeDate . '.xml';
-
-                header('Content-Type: application/xml; charset=UTF-8');
-                header('Content-Disposition: attachment; filename="' . $fileName . '"');
-                header('Content-Length: ' . strlen($xml));
-
-                echo $xml;
-                exit;
-            }
+            $metaPath = $jobsDir . '/' . $jobId . '.json';
+            file_put_contents($metaPath, json_encode($job, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+            $jobCreatedId = $jobId;
         }
     } elseif ($action === 'preview') {
         $error = 'Najpierw wgraj pliki i wygeneruj JPK.';
@@ -847,6 +982,8 @@ if (($_SERVER['REQUEST_METHOD'] ?? null) === 'POST' && isset($_FILES['invoice_pd
         $error = 'Brak wcześniej wygenerowanego JPK. Najpierw wgraj pliki i użyj podglądu lub zapisu.';
     }
 }
+
+$jobs = loadJpkJobs();
 
 ?>
 <!doctype html>
@@ -995,6 +1132,13 @@ if (($_SERVER['REQUEST_METHOD'] ?? null) === 'POST' && isset($_FILES['invoice_pd
         <?php endif; ?>
     </form>
 
+    <?php if (isset($jobCreatedId) && !$error): ?>
+        <div class="result">
+            <h2>Przetwarzanie w tle</h2>
+            <p>Zadanie <?php echo htmlspecialchars($jobCreatedId, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?> zostało dodane do kolejki. Po zakończeniu pojawi się na liście poniżej.</p>
+        </div>
+    <?php endif; ?>
+
     <?php if ($debugText !== null): ?>
         <div class="result">
             <h2>Surowy tekst z PDF (debug)</h2>
@@ -1019,6 +1163,42 @@ if (($_SERVER['REQUEST_METHOD'] ?? null) === 'POST' && isset($_FILES['invoice_pd
             <div class="hint">
                 Skopiuj treść do pliku z rozszerzeniem <strong>.xml</strong> i zweryfikuj go w narzędziu MF lub swoim systemie księgowym.
             </div>
+        </div>
+    <?php endif; ?>
+
+    <?php if (!empty($jobs)): ?>
+        <div class="result">
+            <h2>Kolejka zadań JPK</h2>
+            <table>
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Data utworzenia</th>
+                    <th>Status</th>
+                    <th>Liczba plików</th>
+                    <th>Akcja</th>
+                </tr>
+                </thead>
+                <tbody>
+                <?php foreach ($jobs as $job): ?>
+                    <tr>
+                        <td><?php echo htmlspecialchars((string)($job['id'] ?? ''), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></td>
+                        <td><?php echo htmlspecialchars((string)($job['created_at'] ?? ''), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></td>
+                        <td><?php echo htmlspecialchars((string)($job['status'] ?? ''), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></td>
+                        <td><?php echo htmlspecialchars((string)count($job['files'] ?? []), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></td>
+                        <td>
+                            <?php if (($job['status'] ?? '') === 'done' && !empty($job['result_file'])): ?>
+                                <a href="<?php echo htmlspecialchars((string)$job['result_file'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">Pobierz</a>
+                            <?php elseif (($job['status'] ?? '') === 'error' && !empty($job['error'])): ?>
+                                <?php echo htmlspecialchars((string)$job['error'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>
+                            <?php else: ?>
+                                Oczekuje
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
         </div>
     <?php endif; ?>
 </div>
