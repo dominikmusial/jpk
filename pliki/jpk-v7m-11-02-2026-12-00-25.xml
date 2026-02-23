@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<JPK xmlns:etd="http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2021/06/08/eD/DefinicjeTypy/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://crd.gov.pl/wzor/2021/12/27/11148/">
+  <Naglowek>
+    <KodFormularza kodSystemowy="JPK_V7M (2)" wersjaSchemy="1-0E">JPK_VAT</KodFormularza>
+    <WariantFormularza>2</WariantFormularza>
+    <DataWytworzeniaJPK>2026-02-11T12:00:24Z</DataWytworzeniaJPK>
+    <NazwaSystemu>Fakturowo.pl</NazwaSystemu>
+    <CelZlozenia poz="P_7">1</CelZlozenia>
+    <KodUrzedu>2415</KodUrzedu>
+    <Rok>2026</Rok>
+    <Miesiac>1</Miesiac>
+  </Naglowek>
+  <Podmiot1 rola="Podatnik">
+    <OsobaFizyczna>
+      <etd:NIP>6322033623</etd:NIP>
+      <etd:ImiePierwsze>Krystian</etd:ImiePierwsze>
+      <etd:Nazwisko>Gędłek</etd:Nazwisko>
+      <etd:DataUrodzenia>2004-09-13</etd:DataUrodzenia>
+      <Email>exclusive_kicks@wp.pl</Email>
+    </OsobaFizyczna>
+  </Podmiot1>
+  <Deklaracja>
+    <Naglowek>
+      <KodFormularzaDekl kodSystemowy="VAT-7 (22)" kodPodatku="VAT" rodzajZobowiazania="Z" wersjaSchemy="1-0E">VAT-7</KodFormularzaDekl>
+      <WariantFormularzaDekl>22</WariantFormularzaDekl>
+    </Naglowek>
+    <PozycjeSzczegolowe>
+      <P_13>244042</P_13>
+      <P_19>-324</P_19>
+      <P_20>-74</P_20>
+      <P_37>243718</P_37>
+      <P_38>-74</P_38>
+      <P_51>0</P_51>
+      <P_53>74</P_53>
+      <P_62>74</P_62>
+    </PozycjeSzczegolowe>
+    <Pouczenia>1</Pouczenia>
+  </Deklaracja>
+  <Ewidencja>
+    <SprzedazWiersz>
+      <LpSprzedazy>1</LpSprzedazy>
+      <KodKrajuNadaniaTIN>SK</KodKrajuNadaniaTIN>
+      <NrKontrahenta>2121176288</NrKontrahenta>
+      <NazwaKontrahenta>AH COM s.r.o.</NazwaKontrahenta>
+      <DowodSprzedazy>01/01/2026</DowodSprzedazy>
+      <DataWystawienia>2026-01-05</DataWystawienia>
+      <K_13>54145.17</K_13>
+    </SprzedazWiersz>
+    <SprzedazWiersz>
+      <LpSprzedazy>2</LpSprzedazy>
+      <KodKrajuNadaniaTIN>RO</KodKrajuNadaniaTIN>
+      <NrKontrahenta>43635724</NrKontrahenta>
+      <NazwaKontrahenta>CORA KICKS SRL</NazwaKontrahenta>
+      <DowodSprzedazy>02/01/2026</DowodSprzedazy>
+      <DataWystawienia>2026-01-11</DataWystawienia>
+      <K_13>24277.79</K_13>
+    </SprzedazWiersz>
+    <SprzedazWiersz>
+      <LpSprzedazy>3</LpSprzedazy>
+      <KodKrajuNadaniaTIN>SK</KodKrajuNadaniaTIN>
+      <NrKontrahenta>2121176288</NrKontrahenta>
+      <NazwaKontrahenta>AH COM s.r.o.</NazwaKontrahenta>
+      <DowodSprzedazy>03/01/2026</DowodSprzedazy>
+      <DataWystawienia>2026-01-14</DataWystawienia>
+      <K_13>111523.17</K_13>
+    </SprzedazWiersz>
+    <SprzedazWiersz>
+      <LpSprzedazy>4</LpSprzedazy>
+      <NrKontrahenta>brak</NrKontrahenta>
+      <NazwaKontrahenta>Miłosz Łacny</NazwaKontrahenta>
+      <DowodSprzedazy>FK/01/01/2026</DowodSprzedazy>
+      <DataWystawienia>2026-01-14</DataWystawienia>
+      <K_19>-231.69</K_19>
+      <K_20>-53.29</K_20>
+    </SprzedazWiersz>
+    <SprzedazWiersz>
+      <LpSprzedazy>5</LpSprzedazy>
+      <NrKontrahenta>brak</NrKontrahenta>
+      <NazwaKontrahenta>Adrian Sekrecki</NazwaKontrahenta>
+      <DowodSprzedazy>FK/02/01/2026</DowodSprzedazy>
+      <DataWystawienia>2026-01-22</DataWystawienia>
+      <K_19>-91.84</K_19>
+      <K_20>-21.12</K_20>
+    </SprzedazWiersz>
+    <SprzedazWiersz>
+      <LpSprzedazy>6</LpSprzedazy>
+      <KodKrajuNadaniaTIN>RO</KodKrajuNadaniaTIN>
+      <NrKontrahenta>43635724</NrKontrahenta>
+      <NazwaKontrahenta>CORA KICKS SRL</NazwaKontrahenta>
+      <DowodSprzedazy>04/01/2026</DowodSprzedazy>
+      <DataWystawienia>2026-01-26</DataWystawienia>
+      <K_13>49597.98</K_13>
+    </SprzedazWiersz>
+    <SprzedazWiersz>
+      <LpSprzedazy>7</LpSprzedazy>
+      <KodKrajuNadaniaTIN>RO</KodKrajuNadaniaTIN>
+      <NrKontrahenta>43635724</NrKontrahenta>
+      <NazwaKontrahenta>CORA KICKS SRL</NazwaKontrahenta>
+      <DowodSprzedazy>05/01/2026</DowodSprzedazy>
+      <DataWystawienia>2026-01-28</DataWystawienia>
+      <K_13>4497.42</K_13>
+    </SprzedazWiersz>
+    <SprzedazCtrl>
+      <LiczbaWierszySprzedazy>7</LiczbaWierszySprzedazy>
+      <PodatekNalezny>-74.41</PodatekNalezny>
+    </SprzedazCtrl>
+    <ZakupCtrl>
+      <LiczbaWierszyZakupow>0</LiczbaWierszyZakupow>
+      <PodatekNaliczony>0</PodatekNaliczony>
+    </ZakupCtrl>
+  </Ewidencja>
+</JPK>
