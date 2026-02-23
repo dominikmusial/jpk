@@ -704,6 +704,8 @@ function generateJpkFaXml(array $invoices, array $meta): string
     return $dom->saveXML();
 }
 
+set_time_limit(0);
+ini_set('memory_limit', '1024M');
 $xml = null;
 $error = null;
 $debugText = null;
