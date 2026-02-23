@@ -955,13 +955,18 @@ $action = $_POST['action'] ?? 'preview';
 if (($_SERVER['REQUEST_METHOD'] ?? null) === 'POST' && $action === 'run_worker') {
     $executedInBackground = false;
 
-    if (function_exists('exec')) {
+    $disabled = (string)ini_get('disable_functions');
+    $execDisabled = stripos($disabled, 'exec') !== false;
+
+    if (function_exists('exec') && !$execDisabled) {
         $php = escapeshellarg(PHP_BINARY);
         $script = escapeshellarg(__FILE__);
         $cmd = $php . ' ' . $script . ' worker > /dev/null 2>&1 &';
+        $out = [];
+        $code = 1;
         @exec($cmd, $out, $code);
 
-        if (!isset($code) || $code === 0) {
+        if ($code === 0) {
             $executedInBackground = true;
         }
     }
