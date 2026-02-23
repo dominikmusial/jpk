@@ -775,6 +775,29 @@ function removeBasketFile(string $fileName): void
     }
 }
 
+function deleteDirectoryRecursive(string $dir): void
+{
+    if (!is_dir($dir)) {
+        return;
+    }
+
+    foreach (scandir($dir) ?: [] as $name) {
+        if ($name === '.' || $name === '..') {
+            continue;
+        }
+
+        $path = $dir . '/' . $name;
+
+        if (is_dir($path)) {
+            deleteDirectoryRecursive($path);
+        } elseif (is_file($path)) {
+            @unlink($path);
+        }
+    }
+
+    @rmdir($dir);
+}
+
 function loadJpkJobs(): array
 {
     $jobsDir = jpkJobsDir();
@@ -1079,6 +1102,24 @@ if (($_SERVER['REQUEST_METHOD'] ?? null) === 'POST') {
                 $jobCreatedId = $jobId;
             }
         }
+    } elseif ($action === 'job_delete' && isset($_POST['job_id'])) {
+        $jobsDir = jpkJobsDir();
+        $jobId = basename((string)$_POST['job_id']);
+        $metaPath = $jobsDir . '/' . $jobId . '.json';
+        $resultPath = $jobsDir . '/' . $jobId . '.xml';
+        $jobDir = $jobsDir . '/' . $jobId;
+
+        if (is_file($metaPath)) {
+            @unlink($metaPath);
+        }
+
+        if (is_file($resultPath)) {
+            @unlink($resultPath);
+        }
+
+        if (is_dir($jobDir)) {
+            deleteDirectoryRecursive($jobDir);
+        }
     }
 }
 
@@ -1298,6 +1339,29 @@ $basketFiles = loadBasketFiles();
             color: #6b7280;
             margin-top: 8px;
         }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        th, td {
+            border-bottom: 1px solid #e5e7eb;
+            padding: 6px 8px;
+            text-align: left;
+        }
+        th {
+            background: #f9fafb;
+            font-weight: 600;
+        }
+        .job-actions {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .job-actions form {
+            margin: 0;
+        }
     </style>
 </head>
 <body>
@@ -1429,13 +1493,21 @@ $basketFiles = loadBasketFiles();
                         <td><?php echo htmlspecialchars((string)($job['status'] ?? ''), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></td>
                         <td><?php echo htmlspecialchars((string)count($job['files'] ?? []), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></td>
                         <td>
-                            <?php if (($job['status'] ?? '') === 'done' && !empty($job['result_file'])): ?>
-                                <a href="<?php echo htmlspecialchars((string)$job['result_file'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">Pobierz</a>
-                            <?php elseif (($job['status'] ?? '') === 'error' && !empty($job['error'])): ?>
-                                <?php echo htmlspecialchars((string)$job['error'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>
-                            <?php else: ?>
-                                Oczekuje
-                            <?php endif; ?>
+                            <div class="job-actions">
+                                <?php $jobStatus = (string)($job['status'] ?? ''); ?>
+                                <?php if (($job['status'] ?? '') === 'done' && !empty($job['result_file'])): ?>
+                                    <a href="<?php echo htmlspecialchars((string)$job['result_file'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">Pobierz</a>
+                                <?php elseif (($job['status'] ?? '') === 'error' && !empty($job['error'])): ?>
+                                    <span><?php echo htmlspecialchars((string)$job['error'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></span>
+                                <?php else: ?>
+                                    <span>Oczekuje</span>
+                                <?php endif; ?>
+                                <form method="post">
+                                    <input type="hidden" name="job_id" value="<?php echo htmlspecialchars((string)($job['id'] ?? ''), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
+                                    <?php $btnLabel = $jobStatus === 'pending' ? 'Anuluj' : 'Usuń'; ?>
+                                    <button type="submit" name="action" value="job_delete"><?php echo htmlspecialchars($btnLabel, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                 <?php endforeach; ?>
