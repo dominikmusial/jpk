@@ -863,6 +863,10 @@ $email = $_POST['email'] ?? 'exclusive_kicks@wp.pl';
 $phone = $_POST['phone'] ?? '512736370';
 $action = $_POST['action'] ?? 'preview';
 
+if (($_SERVER['REQUEST_METHOD'] ?? null) === 'POST' && $action === 'run_worker') {
+    jpkRunWorker();
+}
+
 if (($_SERVER['REQUEST_METHOD'] ?? null) === 'POST' && isset($_FILES['invoice_pdf'])) {
     $tmpNames = $_FILES['invoice_pdf']['tmp_name'] ?? [];
     $origNames = $_FILES['invoice_pdf']['name'] ?? [];
@@ -1199,6 +1203,9 @@ $jobs = loadJpkJobs();
                 <?php endforeach; ?>
                 </tbody>
             </table>
+            <form method="post" style="margin-top: 12px;">
+                <button type="submit" name="action" value="run_worker">Przelicz wszystkie oczekujące zadania teraz</button>
+            </form>
         </div>
     <?php endif; ?>
 </div>
