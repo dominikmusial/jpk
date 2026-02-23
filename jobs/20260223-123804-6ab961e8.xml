@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<JPK xmlns="http://crd.gov.pl/wzor/2021/12/27/11148/" xmlns:etd="http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2021/06/08/eD/DefinicjeTypy/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Naglowek>
+    <KodFormularza kodSystemowy="JPK_V7M (2)" wersjaSchemy="1-0E">JPK_VAT</KodFormularza>
+    <WariantFormularza>2</WariantFormularza>
+    <DataWytworzeniaJPK>2026-02-23T12:38:58Z</DataWytworzeniaJPK>
+    <NazwaSystemu>PDF2JPK</NazwaSystemu>
+    <CelZlozenia poz="P_7">1</CelZlozenia>
+    <KodUrzedu>2415</KodUrzedu>
+    <Rok>2026</Rok>
+    <Miesiac>1</Miesiac>
+  </Naglowek>
+  <Podmiot1 rola="Podatnik">
+    <OsobaFizyczna xmlns:etd="http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2021/06/08/eD/DefinicjeTypy/">
+      <etd:NIP xmlns:etd="http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2021/06/08/eD/DefinicjeTypy/">6322033623</etd:NIP>
+      <etd:ImiePierwsze xmlns:etd="http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2021/06/08/eD/DefinicjeTypy/">Krystian</etd:ImiePierwsze>
+      <etd:Nazwisko xmlns:etd="http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2021/06/08/eD/DefinicjeTypy/">Gędłek</etd:Nazwisko>
+      <etd:DataUrodzenia xmlns:etd="http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2021/06/08/eD/DefinicjeTypy/">2004-09-13</etd:DataUrodzenia>
+      <Email>exclusive_kicks@wp.pl</Email>
+    </OsobaFizyczna>
+  </Podmiot1>
+  <Deklaracja>
+    <Naglowek>
+      <KodFormularzaDekl kodSystemowy="VAT-7 (22)" kodPodatku="VAT" rodzajZobowiazania="Z" wersjaSchemy="1-0E">VAT-7</KodFormularzaDekl>
+      <WariantFormularzaDekl>22</WariantFormularzaDekl>
+    </Naglowek>
+    <PozycjeSzczegolowe>
+      <P_19>74.37</P_19>
+      <P_20>17.11</P_20>
+      <P_37>74.37</P_37>
+      <P_38>17.11</P_38>
+      <P_51>17.11</P_51>
+    </PozycjeSzczegolowe>
+    <Pouczenia>1</Pouczenia>
+  </Deklaracja>
+  <Ewidencja>
+    <SprzedazWiersz>
+      <LpSprzedazy>1</LpSprzedazy>
+      <NrKontrahenta>BRAK</NrKontrahenta>
+      <NazwaKontrahenta>Małgorzata Żytkowska</NazwaKontrahenta>
+      <DowodSprzedazy>INV-PL-1220800-2026-1</DowodSprzedazy>
+      <DataWystawienia>2026-01-02</DataWystawienia>
+      <GTU_12>1</GTU_12>
+      <K_19>74.37</K_19>
+      <K_20>17.11</K_20>
+    </SprzedazWiersz>
+    <SprzedazCtrl>
+      <LiczbaWierszySprzedazy>1</LiczbaWierszySprzedazy>
+      <PodatekNalezny>17.11</PodatekNalezny>
+    </SprzedazCtrl>
+    <ZakupCtrl>
+      <LiczbaWierszyZakupow>0</LiczbaWierszyZakupow>
+      <PodatekNaliczony>0.00</PodatekNaliczony>
+    </ZakupCtrl>
+  </Ewidencja>
+</JPK>

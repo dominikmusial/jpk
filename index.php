@@ -709,6 +709,72 @@ function jpkJobsDir(): string
     return __DIR__ . '/jobs';
 }
 
+function jpkBasketDir(): string
+{
+    return __DIR__ . '/basket';
+}
+
+function loadBasketFiles(): array
+{
+    $dir = jpkBasketDir();
+
+    if (!is_dir($dir)) {
+        return [];
+    }
+
+    $files = [];
+
+    foreach (scandir($dir) ?: [] as $name) {
+        if ($name === '.' || $name === '..') {
+            continue;
+        }
+
+        $path = $dir . '/' . $name;
+
+        if (!is_file($path)) {
+            continue;
+        }
+
+        $files[] = $name;
+    }
+
+    sort($files);
+
+    return $files;
+}
+
+function clearBasket(): void
+{
+    $dir = jpkBasketDir();
+
+    if (!is_dir($dir)) {
+        return;
+    }
+
+    foreach (scandir($dir) ?: [] as $name) {
+        if ($name === '.' || $name === '..') {
+            continue;
+        }
+
+        $path = $dir . '/' . $name;
+
+        if (is_file($path)) {
+            @unlink($path);
+        }
+    }
+}
+
+function removeBasketFile(string $fileName): void
+{
+    $dir = jpkBasketDir();
+    $base = basename($fileName);
+    $path = $dir . '/' . $base;
+
+    if (is_file($path)) {
+        @unlink($path);
+    }
+}
+
 function loadJpkJobs(): array
 {
     $jobsDir = jpkJobsDir();
@@ -864,10 +930,159 @@ $phone = $_POST['phone'] ?? '512736370';
 $action = $_POST['action'] ?? 'preview';
 
 if (($_SERVER['REQUEST_METHOD'] ?? null) === 'POST' && $action === 'run_worker') {
-    jpkRunWorker();
+    $php = escapeshellarg(PHP_BINARY);
+    $script = escapeshellarg(__FILE__);
+    $cmd = $php . ' ' . $script . ' worker > /dev/null 2>&1 &';
+    @exec($cmd);
 }
 
-if (($_SERVER['REQUEST_METHOD'] ?? null) === 'POST' && isset($_FILES['invoice_pdf'])) {
+if (($_SERVER['REQUEST_METHOD'] ?? null) === 'POST') {
+    if ($action === 'basket_add' && isset($_FILES['invoice_pdf'])) {
+        $tmpNames = $_FILES['invoice_pdf']['tmp_name'] ?? [];
+        $origNames = $_FILES['invoice_pdf']['name'] ?? [];
+
+        if (!is_array($tmpNames)) {
+            $tmpNames = [$tmpNames];
+            $origNames = is_array($origNames) ? $origNames : [$origNames];
+        }
+
+        $dir = jpkBasketDir();
+
+        if (!is_dir($dir)) {
+            mkdir($dir, 0777, true);
+        }
+
+        $count = count($tmpNames);
+
+        for ($i = 0; $i < $count; $i++) {
+            $tmpPath = $tmpNames[$i];
+            $origName = (string)($origNames[$i] ?? '');
+
+            if (!is_uploaded_file($tmpPath) || $origName === '') {
+                continue;
+            }
+
+            $clean = preg_replace('/[^A-Za-z0-9\.\-\_]/', '_', $origName);
+
+            if ($clean === '') {
+                $clean = 'plik';
+            }
+
+            $targetPath = $dir . '/' . $clean;
+            $n = 1;
+
+            while (file_exists($targetPath)) {
+                $targetPath = $dir . '/' . $n . '_' . $clean;
+                $n++;
+            }
+
+            @move_uploaded_file($tmpPath, $targetPath);
+        }
+    } elseif ($action === 'basket_remove' && isset($_POST['basket_file'])) {
+        removeBasketFile((string)$_POST['basket_file']);
+    } elseif ($action === 'basket_clear') {
+        clearBasket();
+    } elseif ($action === 'basket_create_job') {
+        $basketDir = jpkBasketDir();
+        $files = [];
+
+        if (is_dir($basketDir)) {
+            foreach (scandir($basketDir) ?: [] as $name) {
+                if ($name === '.' || $name === '..') {
+                    continue;
+                }
+
+                $path = $basketDir . '/' . $name;
+
+                if (is_file($path)) {
+                    $files[] = $name;
+                }
+            }
+        }
+
+        if (empty($files)) {
+            $error = 'Brak plików w koszyku. Najpierw dodaj pliki.';
+        } else {
+            $jobsDir = jpkJobsDir();
+
+            if (!is_dir($jobsDir)) {
+                mkdir($jobsDir, 0777, true);
+            }
+
+            $jobId = date('Ymd-His') . '-' . bin2hex(random_bytes(4));
+            $jobDir = $jobsDir . '/' . $jobId;
+
+            if (!is_dir($jobDir)) {
+                mkdir($jobDir, 0777, true);
+            }
+
+            $storedFiles = [];
+            $index = 1;
+
+            foreach ($files as $fileName) {
+                $sourcePath = $basketDir . '/' . $fileName;
+
+                if (!is_file($sourcePath)) {
+                    continue;
+                }
+
+                $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+
+                if ($ext === '') {
+                    $ext = 'dat';
+                }
+
+                $storedName = 'file-' . $index . '.' . $ext;
+                $targetPath = $jobDir . '/' . $storedName;
+
+                if (!@rename($sourcePath, $targetPath)) {
+                    if (!@copy($sourcePath, $targetPath)) {
+                        continue;
+                    }
+                }
+
+                $storedFiles[] = [
+                    'original_name' => $fileName,
+                    'stored_name' => $storedName,
+                    'extension' => $ext,
+                ];
+
+                $index++;
+            }
+
+            clearBasket();
+
+            if (empty($storedFiles)) {
+                $error = 'Nie udało się przenieść plików z koszyka do kolejki.';
+            } else {
+                $job = [
+                    'id' => $jobId,
+                    'created_at' => date('c'),
+                    'status' => 'pending',
+                    'meta' => [
+                        'company_name' => $companyName,
+                        'company_nip' => $companyNip,
+                        'office_code' => $officeCode,
+                        'first_name' => $firstName,
+                        'last_name' => $lastName,
+                        'birth_date' => $birthDate,
+                        'email' => $email,
+                        'phone' => $phone,
+                    ],
+                    'files' => $storedFiles,
+                    'result_file' => null,
+                    'error' => null,
+                ];
+
+                $metaPath = $jobsDir . '/' . $jobId . '.json';
+                file_put_contents($metaPath, json_encode($job, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+                $jobCreatedId = $jobId;
+            }
+        }
+    }
+}
+
+if (($_SERVER['REQUEST_METHOD'] ?? null) === 'POST' && isset($_FILES['invoice_pdf']) && $action !== 'basket_add') {
     $tmpNames = $_FILES['invoice_pdf']['tmp_name'] ?? [];
     $origNames = $_FILES['invoice_pdf']['name'] ?? [];
 
@@ -988,6 +1203,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? null) === 'POST' && isset($_FILES['invoice_pd
 }
 
 $jobs = loadJpkJobs();
+$basketFiles = loadBasketFiles();
 
 ?>
 <!doctype html>
@@ -1126,10 +1342,11 @@ $jobs = loadJpkJobs();
             <label for="invoice_pdf">Pliki źródłowe (PDF / CSV / XML)</label>
             <input type="file" id="invoice_pdf" name="invoice_pdf[]" accept="application/pdf,text/csv,.csv,application/xml,text/xml,.xml" multiple>
         </div>
-        <button type="submit" name="action" value="preview">Podgląd JPK XML</button>
-        <button type="submit" name="action" value="download">Zapisz JPK jako plik XML</button>
+        <div id="file_list" class="field"></div>
+        <button type="submit" name="action" value="basket_add">Wyślij pliki na serwer</button>
+        <button type="submit" name="action" value="basket_create_job">Utwórz zadanie JPK z plików na serwerze</button>
         <div class="hint">
-            Do dokładnego działania trzeba dopasować wyrażenia regularne do formatów Twoich faktur i dopracować strukturę JPK zgodnie z oficjalnym XSD (np. JPK_FA lub JPK_V7).
+            Najpierw wyślij pliki na serwer (możesz robić to w kilku paczkach), a następnie utwórz jedno zadanie JPK z wszystkich plików zapisanych na serwerze.
         </div>
         <?php if ($error): ?>
             <div class="error"><?php echo htmlspecialchars($error, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></div>
@@ -1167,6 +1384,27 @@ $jobs = loadJpkJobs();
             <div class="hint">
                 Skopiuj treść do pliku z rozszerzeniem <strong>.xml</strong> i zweryfikuj go w narzędziu MF lub swoim systemie księgowym.
             </div>
+        </div>
+    <?php endif; ?>
+
+    <?php if (!empty($basketFiles)): ?>
+        <div class="result">
+            <h2>Pliki zapisane na serwerze</h2>
+            <p>Aktualnie na serwerze: <?php echo htmlspecialchars((string)count($basketFiles), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?> plików.</p>
+            <ul>
+                <?php foreach ($basketFiles as $basketFile): ?>
+                    <li>
+                        <?php echo htmlspecialchars($basketFile, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>
+                        <form method="post" style="display:inline;">
+                            <input type="hidden" name="basket_file" value="<?php echo htmlspecialchars($basketFile, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
+                            <button type="submit" name="action" value="basket_remove">Usuń z serwera</button>
+                        </form>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+            <form method="post" style="margin-top: 8px;">
+                <button type="submit" name="action" value="basket_clear">Usuń wszystkie pliki z serwera</button>
+            </form>
         </div>
     <?php endif; ?>
 
@@ -1209,5 +1447,103 @@ $jobs = loadJpkJobs();
         </div>
     <?php endif; ?>
 </div>
+<script>
+    var fileInput = document.getElementById('invoice_pdf');
+    var fileList = document.getElementById('file_list');
+    function renderFileList() {
+        if (!fileInput || !fileList) {
+            return;
+        }
+        var files = fileInput.files;
+        if (!files || files.length === 0) {
+            fileList.innerHTML = '';
+            return;
+        }
+        var html = '<label>Wybrane pliki</label><ul style="list-style:none;padding-left:0;margin-top:4px;">';
+        for (var i = 0; i < files.length; i++) {
+            html += '<li style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">' +
+                '<span style="font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:70%;">' +
+                files[i].name +
+                '</span>' +
+                '<button type="button" data-remove-index="' + i + '" style="margin-left:8px;border:none;border-radius:4px;background:#ef4444;color:#ffffff;padding:2px 8px;font-size:11px;cursor:pointer;">Usuń</button>' +
+                '</li>';
+        }
+        html += '</ul>';
+        fileList.innerHTML = html;
+        var buttons = fileList.querySelectorAll('button[data-remove-index]');
+        buttons.forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var index = parseInt(this.getAttribute('data-remove-index'), 10);
+                var dt = new DataTransfer();
+                for (var i = 0; i < fileInput.files.length; i++) {
+                    if (i === index) {
+                        continue;
+                    }
+                    dt.items.add(fileInput.files[i]);
+                }
+                fileInput.files = dt.files;
+                renderFileList();
+            });
+        });
+    }
+    if (fileInput && fileList) {
+        fileInput.addEventListener('change', renderFileList);
+    }
+
+    var basketAddButton = document.querySelector('button[name="action"][value="basket_add"]');
+    var mainForm = document.querySelector('form[enctype="multipart/form-data"]');
+    var isUploading = false;
+
+    if (basketAddButton && mainForm && fileInput) {
+        basketAddButton.addEventListener('click', function (e) {
+            if (!fileInput.files || fileInput.files.length === 0 || isUploading) {
+                return;
+            }
+            e.preventDefault();
+            isUploading = true;
+            basketAddButton.disabled = true;
+
+            var statusEl = document.getElementById('upload_status');
+            if (!statusEl) {
+                statusEl = document.createElement('div');
+                statusEl.id = 'upload_status';
+                statusEl.className = 'hint';
+                mainForm.appendChild(statusEl);
+            }
+
+            var files = Array.prototype.slice.call(fileInput.files);
+            var total = files.length;
+            var index = 0;
+
+            function uploadNext() {
+                if (index >= total) {
+                    statusEl.textContent = 'Dodano do koszyka ' + total + ' plików. Odświeżam widok...';
+                    window.location.reload();
+                    return;
+                }
+
+                var file = files[index];
+                statusEl.textContent = 'Wysyłanie pliku ' + (index + 1) + ' z ' + total + '...';
+
+                var fd = new FormData();
+                fd.append('action', 'basket_add');
+                fd.append('invoice_pdf[]', file, file.name);
+
+                fetch(window.location.href, {
+                    method: 'POST',
+                    body: fd
+                }).then(function () {
+                    index++;
+                    uploadNext();
+                }).catch(function () {
+                    index++;
+                    uploadNext();
+                });
+            }
+
+            uploadNext();
+        });
+    }
+</script>
 </body>
 </html>

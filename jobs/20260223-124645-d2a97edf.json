@@ -1,0 +1,474 @@
+{
+    "id": "20260223-124645-d2a97edf",
+    "created_at": "2026-02-23T12:46:45+00:00",
+    "status": "pending",
+    "meta": {
+        "company_name": "Exclusive Kicks Krystian Gędłek",
+        "company_nip": "6322033623",
+        "office_code": "2415",
+        "first_name": "Krystian",
+        "last_name": "Gędłek",
+        "birth_date": "2004-09-13",
+        "email": "exclusive_kicks@wp.pl",
+        "phone": "512736370"
+    },
+    "files": [
+        {
+            "original_name": "INV-PL-1220800-2026-1.pdf",
+            "stored_name": "file-1.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-2.pdf",
+            "stored_name": "file-2.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-3.pdf",
+            "stored_name": "file-3.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-5.pdf",
+            "stored_name": "file-4.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-6.pdf",
+            "stored_name": "file-5.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-7.pdf",
+            "stored_name": "file-6.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-8.pdf",
+            "stored_name": "file-7.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-9.pdf",
+            "stored_name": "file-8.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-10.pdf",
+            "stored_name": "file-9.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-11.pdf",
+            "stored_name": "file-10.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-13.pdf",
+            "stored_name": "file-11.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-14.pdf",
+            "stored_name": "file-12.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-15.pdf",
+            "stored_name": "file-13.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-16.pdf",
+            "stored_name": "file-14.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-17.pdf",
+            "stored_name": "file-15.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-18.pdf",
+            "stored_name": "file-16.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-19.pdf",
+            "stored_name": "file-17.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-20.pdf",
+            "stored_name": "file-18.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-21.pdf",
+            "stored_name": "file-19.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-23.pdf",
+            "stored_name": "file-20.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-24.pdf",
+            "stored_name": "file-21.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-25.pdf",
+            "stored_name": "file-22.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-26.pdf",
+            "stored_name": "file-23.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-27.pdf",
+            "stored_name": "file-24.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-28.pdf",
+            "stored_name": "file-25.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-29.pdf",
+            "stored_name": "file-26.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-31.pdf",
+            "stored_name": "file-27.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-32.pdf",
+            "stored_name": "file-28.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-33.pdf",
+            "stored_name": "file-29.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-34.pdf",
+            "stored_name": "file-30.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-35.pdf",
+            "stored_name": "file-31.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-36.pdf",
+            "stored_name": "file-32.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-37.pdf",
+            "stored_name": "file-33.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-38.pdf",
+            "stored_name": "file-34.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-39.pdf",
+            "stored_name": "file-35.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-40.pdf",
+            "stored_name": "file-36.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-41.pdf",
+            "stored_name": "file-37.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-42.pdf",
+            "stored_name": "file-38.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-43.pdf",
+            "stored_name": "file-39.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-44.pdf",
+            "stored_name": "file-40.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-45.pdf",
+            "stored_name": "file-41.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-46.pdf",
+            "stored_name": "file-42.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-47.pdf",
+            "stored_name": "file-43.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-48.pdf",
+            "stored_name": "file-44.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-49.pdf",
+            "stored_name": "file-45.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-50.pdf",
+            "stored_name": "file-46.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-51.pdf",
+            "stored_name": "file-47.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-52.pdf",
+            "stored_name": "file-48.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-53.pdf",
+            "stored_name": "file-49.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-54.pdf",
+            "stored_name": "file-50.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-55.pdf",
+            "stored_name": "file-51.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-56.pdf",
+            "stored_name": "file-52.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-58.pdf",
+            "stored_name": "file-53.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-59.pdf",
+            "stored_name": "file-54.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-60.pdf",
+            "stored_name": "file-55.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-61.pdf",
+            "stored_name": "file-56.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-62.pdf",
+            "stored_name": "file-57.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-63.pdf",
+            "stored_name": "file-58.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-64.pdf",
+            "stored_name": "file-59.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-65.pdf",
+            "stored_name": "file-60.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-66.pdf",
+            "stored_name": "file-61.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-67.pdf",
+            "stored_name": "file-62.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-68.pdf",
+            "stored_name": "file-63.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-69.pdf",
+            "stored_name": "file-64.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-70.pdf",
+            "stored_name": "file-65.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-71.pdf",
+            "stored_name": "file-66.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-72.pdf",
+            "stored_name": "file-67.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-73.pdf",
+            "stored_name": "file-68.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-74.pdf",
+            "stored_name": "file-69.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-75.pdf",
+            "stored_name": "file-70.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-77.pdf",
+            "stored_name": "file-71.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-78.pdf",
+            "stored_name": "file-72.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-79.pdf",
+            "stored_name": "file-73.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-81.pdf",
+            "stored_name": "file-74.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-82.pdf",
+            "stored_name": "file-75.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-83.pdf",
+            "stored_name": "file-76.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-84.pdf",
+            "stored_name": "file-77.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-85.pdf",
+            "stored_name": "file-78.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-86.pdf",
+            "stored_name": "file-79.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-87.pdf",
+            "stored_name": "file-80.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-88.pdf",
+            "stored_name": "file-81.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-89.pdf",
+            "stored_name": "file-82.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-90.pdf",
+            "stored_name": "file-83.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-91.pdf",
+            "stored_name": "file-84.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-92.pdf",
+            "stored_name": "file-85.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-93.pdf",
+            "stored_name": "file-86.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-94.pdf",
+            "stored_name": "file-87.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-95.pdf",
+            "stored_name": "file-88.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-96.pdf",
+            "stored_name": "file-89.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-97.pdf",
+            "stored_name": "file-90.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-99.pdf",
+            "stored_name": "file-91.pdf",
+            "extension": "pdf"
+        }
+    ],
+    "result_file": null,
+    "error": null
+}

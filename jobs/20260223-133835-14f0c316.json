@@ -1,0 +1,119 @@
+{
+    "id": "20260223-133835-14f0c316",
+    "created_at": "2026-02-23T13:38:35+00:00",
+    "status": "pending",
+    "meta": {
+        "company_name": "Exclusive Kicks Krystian Gędłek",
+        "company_nip": "6322033623",
+        "office_code": "2415",
+        "first_name": "Krystian",
+        "last_name": "Gędłek",
+        "birth_date": "2004-09-13",
+        "email": "exclusive_kicks@wp.pl",
+        "phone": "512736370"
+    },
+    "files": [
+        {
+            "original_name": "1_INV-PL-1220800-2026-11.pdf",
+            "stored_name": "file-1.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-1.pdf",
+            "stored_name": "file-2.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-10.pdf",
+            "stored_name": "file-3.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-11.pdf",
+            "stored_name": "file-4.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-13.pdf",
+            "stored_name": "file-5.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-14.pdf",
+            "stored_name": "file-6.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-15.pdf",
+            "stored_name": "file-7.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-16.pdf",
+            "stored_name": "file-8.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-17.pdf",
+            "stored_name": "file-9.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-18.pdf",
+            "stored_name": "file-10.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-19.pdf",
+            "stored_name": "file-11.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-2.pdf",
+            "stored_name": "file-12.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-20.pdf",
+            "stored_name": "file-13.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-21.pdf",
+            "stored_name": "file-14.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-3.pdf",
+            "stored_name": "file-15.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-5.pdf",
+            "stored_name": "file-16.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-6.pdf",
+            "stored_name": "file-17.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-7.pdf",
+            "stored_name": "file-18.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-8.pdf",
+            "stored_name": "file-19.pdf",
+            "extension": "pdf"
+        },
+        {
+            "original_name": "INV-PL-1220800-2026-9.pdf",
+            "stored_name": "file-20.pdf",
+            "extension": "pdf"
+        }
+    ],
+    "result_file": null,
+    "error": null
+}
