@@ -849,85 +849,173 @@ function jpkRunWorker(): void
 
         $jobId = (string)($job['id'] ?? pathinfo($metaPath, PATHINFO_FILENAME));
         $jobDir = $jobsDir . '/' . $jobId;
+        $logPath = $jobsDir . '/' . $jobId . '.log';
 
-        if (!is_dir($jobDir)) {
-            $job['status'] = 'error';
-            $job['error'] = 'Brak katalogu z plikami dla zadania.';
-            file_put_contents($metaPath, json_encode($job, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-            continue;
-        }
+        $writeMeta = function (array $jobData) use ($metaPath): bool {
+            $json = json_encode($jobData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            if (!is_string($json)) {
+                return false;
+            }
+            return file_put_contents($metaPath, $json) !== false;
+        };
 
-        $allInvoices = [];
-        $companyNip = (string)($job['meta']['company_nip'] ?? '');
+        $log = function (string $message) use ($logPath): void {
+            $line = '[' . date('c') . '] ' . $message . PHP_EOL;
+            @file_put_contents($logPath, $line, FILE_APPEND);
+        };
 
-        foreach ($job['files'] as $fileInfo) {
-            $storedName = (string)($fileInfo['stored_name'] ?? '');
-            $originalName = (string)($fileInfo['original_name'] ?? '');
+        try {
+            $filesList = $job['files'] ?? [];
+            $totalFiles = is_array($filesList) ? count($filesList) : 0;
 
-            if ($storedName === '') {
+            $job['status'] = 'running';
+            $job['error'] = null;
+            $job['updated_at'] = date('c');
+            $job['started_at'] = $job['started_at'] ?? date('c');
+            $job['total_files'] = $totalFiles;
+            $job['processed_files'] = 0;
+            $job['current_file'] = null;
+
+            if (!$writeMeta($job)) {
+                $log('Brak uprawnień do zapisu pliku meta zadania: ' . $metaPath);
+                if (defined('STDOUT')) {
+                    fwrite(STDOUT, 'Brak uprawnień do zapisu pliku meta zadania: ' . $jobId . PHP_EOL);
+                }
                 continue;
             }
 
-            $path = $jobDir . '/' . $storedName;
-
-            if (!is_readable($path)) {
+            if (!is_dir($jobDir)) {
+                $job['status'] = 'error';
+                $job['error'] = 'Brak katalogu z plikami dla zadania.';
+                $job['updated_at'] = date('c');
+                $writeMeta($job);
+                $log('Brak katalogu z plikami: ' . $jobDir);
                 continue;
             }
 
-            $extSource = $originalName !== '' ? $originalName : $path;
-            $ext = strtolower(pathinfo($extSource, PATHINFO_EXTENSION));
-            $invoices = [];
+            $allInvoices = [];
+            $companyNip = (string)($job['meta']['company_nip'] ?? '');
 
-            if ($ext === 'pdf') {
-                $invoices = parseInvoicesFromPdf($path, $companyNip);
-            } elseif ($ext === 'csv') {
-                $invoices = parseInvoicesFromCsv($path, $companyNip);
-            } elseif ($ext === 'xml') {
-                $invoices = parseInvoicesFromJpkXml($path, $companyNip);
+            if (!is_array($filesList) || $filesList === []) {
+                $job['status'] = 'error';
+                $job['error'] = 'Brak listy plików do przetworzenia.';
+                $job['updated_at'] = date('c');
+                $writeMeta($job);
+                $log('Brak listy plików do przetworzenia.');
+                continue;
             }
 
-            if (!empty($invoices)) {
-                $allInvoices = array_merge($allInvoices, $invoices);
-            }
-        }
+            $processed = 0;
 
-        if (empty($allInvoices)) {
+            foreach ($filesList as $fileInfo) {
+                $storedName = (string)($fileInfo['stored_name'] ?? '');
+                $originalName = (string)($fileInfo['original_name'] ?? '');
+
+                $processed++;
+                $job['processed_files'] = $processed;
+                $job['current_file'] = $originalName !== '' ? $originalName : $storedName;
+                $job['updated_at'] = date('c');
+
+                if ($processed === 1 || ($processed % 5) === 0) {
+                    $writeMeta($job);
+                }
+
+                if ($storedName === '') {
+                    $log('Pominięto plik bez stored_name.');
+                    continue;
+                }
+
+                $path = $jobDir . '/' . $storedName;
+
+                if (!is_readable($path)) {
+                    $log('Brak dostępu do pliku: ' . $path);
+                    continue;
+                }
+
+                $extSource = $originalName !== '' ? $originalName : $path;
+                $ext = strtolower(pathinfo($extSource, PATHINFO_EXTENSION));
+                $invoices = [];
+
+                if ($ext === 'pdf') {
+                    $invoices = parseInvoicesFromPdf($path, $companyNip);
+                } elseif ($ext === 'csv') {
+                    $invoices = parseInvoicesFromCsv($path, $companyNip);
+                } elseif ($ext === 'xml') {
+                    $invoices = parseInvoicesFromJpkXml($path, $companyNip);
+                } else {
+                    $log('Nieobsługiwane rozszerzenie: ' . $ext . ' (' . $path . ')');
+                }
+
+                if (!empty($invoices)) {
+                    $allInvoices = array_merge($allInvoices, $invoices);
+                } else {
+                    $log('Nie udało się odczytać faktury z pliku: ' . ($originalName !== '' ? $originalName : $storedName));
+                }
+            }
+
+            if (empty($allInvoices)) {
+                $job['status'] = 'error';
+                $job['error'] = 'Nie udało się odczytać danych faktur dla zadania.';
+                $job['current_file'] = null;
+                $job['updated_at'] = date('c');
+                $writeMeta($job);
+                $log('Brak odczytanych faktur (allInvoices puste).');
+                continue;
+            }
+
+            $first = $allInvoices[0];
+
+            $meta = [
+                'purpose' => 1,
+                'period_from' => $first['sell_date'] ?? $first['issue_date'],
+                'period_to' => $first['sell_date'] ?? $first['issue_date'],
+                'office_code' => $job['meta']['office_code'] ?? '2603',
+                'seller_nip' => $companyNip,
+                'seller_name' => $job['meta']['company_name'] ?? '',
+                'buyer_name' => 'Nabywca',
+                'first_name' => $job['meta']['first_name'] ?? '',
+                'last_name' => $job['meta']['last_name'] ?? '',
+                'birth_date' => $job['meta']['birth_date'] ?? '',
+                'email' => $job['meta']['email'] ?? '',
+                'phone' => $job['meta']['phone'] ?? '',
+            ];
+
+            $xml = generateJpkFaXml($allInvoices, $meta);
+            $resultPath = $jobsDir . '/' . $jobId . '.xml';
+
+            if (file_put_contents($resultPath, $xml) === false) {
+                $job['status'] = 'error';
+                $job['error'] = 'Nie udało się zapisać wynikowego pliku XML.';
+                $job['current_file'] = null;
+                $job['updated_at'] = date('c');
+                $writeMeta($job);
+                $log('Nie udało się zapisać XML: ' . $resultPath);
+                continue;
+            }
+
+            $job['status'] = 'done';
+            $job['result_file'] = 'jobs/' . $jobId . '.xml';
+            $job['error'] = null;
+            $job['current_file'] = null;
+            $job['updated_at'] = date('c');
+
+            $writeMeta($job);
+            $log('Zakończono: done');
+
+            if (defined('STDOUT')) {
+                fwrite(STDOUT, 'Przetworzono zadanie ' . $jobId . PHP_EOL);
+            }
+        } catch (Throwable $e) {
             $job['status'] = 'error';
-            $job['error'] = 'Nie udało się odczytać danych faktur dla zadania.';
-            file_put_contents($metaPath, json_encode($job, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-            continue;
-        }
+            $job['error'] = $e->getMessage();
+            $job['current_file'] = $job['current_file'] ?? null;
+            $job['updated_at'] = date('c');
+            $writeMeta($job);
+            $log('Wyjątek: ' . $e->getMessage());
 
-        $first = $allInvoices[0];
-
-        $meta = [
-            'purpose' => 1,
-            'period_from' => $first['sell_date'] ?? $first['issue_date'],
-            'period_to' => $first['sell_date'] ?? $first['issue_date'],
-            'office_code' => $job['meta']['office_code'] ?? '2603',
-            'seller_nip' => $companyNip,
-            'seller_name' => $job['meta']['company_name'] ?? '',
-            'buyer_name' => 'Nabywca',
-            'first_name' => $job['meta']['first_name'] ?? '',
-            'last_name' => $job['meta']['last_name'] ?? '',
-            'birth_date' => $job['meta']['birth_date'] ?? '',
-            'email' => $job['meta']['email'] ?? '',
-            'phone' => $job['meta']['phone'] ?? '',
-        ];
-
-        $xml = generateJpkFaXml($allInvoices, $meta);
-        $resultPath = $jobsDir . '/' . $jobId . '.xml';
-        file_put_contents($resultPath, $xml);
-
-        $job['status'] = 'done';
-        $job['result_file'] = 'jobs/' . $jobId . '.xml';
-        $job['error'] = null;
-        $job['updated_at'] = date('c');
-
-        file_put_contents($metaPath, json_encode($job, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-
-        if (defined('STDOUT')) {
-            fwrite(STDOUT, 'Przetworzono zadanie ' . $jobId . PHP_EOL);
+            if (defined('STDOUT')) {
+                fwrite(STDOUT, 'Błąd zadania ' . $jobId . ': ' . $e->getMessage() . PHP_EOL);
+            }
         }
     }
 }
@@ -1516,7 +1604,25 @@ $basketFiles = loadBasketFiles();
                     <tr>
                         <td><?php echo htmlspecialchars((string)($job['id'] ?? ''), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></td>
                         <td><?php echo htmlspecialchars((string)($job['created_at'] ?? ''), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></td>
-                        <td><?php echo htmlspecialchars((string)($job['status'] ?? ''), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></td>
+                        <td>
+                            <?php
+                            $status = (string)($job['status'] ?? '');
+                            $processed = (int)($job['processed_files'] ?? 0);
+                            $total = (int)($job['total_files'] ?? 0);
+                            if ($status === 'pending') {
+                                echo 'Oczekuje';
+                            } elseif ($status === 'running') {
+                                $suffix = $total > 0 ? (' (' . $processed . '/' . $total . ')') : '';
+                                echo 'Przetwarzanie' . $suffix;
+                            } elseif ($status === 'done') {
+                                echo 'Gotowe';
+                            } elseif ($status === 'error') {
+                                echo 'Błąd';
+                            } else {
+                                echo htmlspecialchars($status, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+                            }
+                            ?>
+                        </td>
                         <td><?php echo htmlspecialchars((string)count($job['files'] ?? []), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></td>
                         <td>
                             <div class="job-actions">
@@ -1526,11 +1632,20 @@ $basketFiles = loadBasketFiles();
                                 <?php elseif (($job['status'] ?? '') === 'error' && !empty($job['error'])): ?>
                                     <span><?php echo htmlspecialchars((string)$job['error'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></span>
                                 <?php else: ?>
-                                    <span>Oczekuje</span>
+                                    <?php if ($jobStatus === 'running'): ?>
+                                        <?php
+                                        $processed = (int)($job['processed_files'] ?? 0);
+                                        $total = (int)($job['total_files'] ?? 0);
+                                        $suffix = $total > 0 ? (' (' . $processed . '/' . $total . ')') : '';
+                                        ?>
+                                        <span>Przetwarzanie<?php echo htmlspecialchars($suffix, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></span>
+                                    <?php else: ?>
+                                        <span>Oczekuje</span>
+                                    <?php endif; ?>
                                 <?php endif; ?>
                                 <form method="post">
                                     <input type="hidden" name="job_id" value="<?php echo htmlspecialchars((string)($job['id'] ?? ''), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
-                                    <?php $btnLabel = $jobStatus === 'pending' ? 'Anuluj' : 'Usuń'; ?>
+                                    <?php $btnLabel = ($jobStatus === 'pending' || $jobStatus === 'running') ? 'Anuluj' : 'Usuń'; ?>
                                     <button type="submit" name="action" value="job_delete"><?php echo htmlspecialchars($btnLabel, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></button>
                                 </form>
                             </div>
