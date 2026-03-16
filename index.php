@@ -1218,6 +1218,24 @@ if (($_SERVER['REQUEST_METHOD'] ?? null) === 'POST') {
                 $jobCreatedId = $jobId;
             }
         }
+    } elseif ($action === 'job_download' && isset($_POST['job_id'])) {
+        $jobsDir = jpkJobsDir();
+        $jobId = basename((string)$_POST['job_id']);
+        $resultPath = $jobsDir . '/' . $jobId . '.xml';
+
+        if (!is_file($resultPath) || !is_readable($resultPath)) {
+            $error = 'Brak wynikowego pliku XML do pobrania.';
+        } else {
+            $fileName = 'jpk-' . $jobId . '.xml';
+
+            header('Content-Type: application/xml; charset=UTF-8');
+            header('Content-Disposition: attachment; filename="' . $fileName . '"');
+            header('Content-Length: ' . (string)filesize($resultPath));
+            header('X-Content-Type-Options: nosniff');
+
+            readfile($resultPath);
+            exit;
+        }
     } elseif ($action === 'job_delete' && isset($_POST['job_id'])) {
         $jobsDir = jpkJobsDir();
         $jobId = basename((string)$_POST['job_id']);
@@ -1630,7 +1648,11 @@ $basketFiles = loadBasketFiles();
                             <div class="job-actions">
                                 <?php $jobStatus = (string)($job['status'] ?? ''); ?>
                                 <?php if (($job['status'] ?? '') === 'done' && !empty($job['result_file'])): ?>
-                                    <a href="<?php echo htmlspecialchars((string)$job['result_file'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">Pobierz</a>
+                                    <a href="<?php echo htmlspecialchars((string)$job['result_file'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>" target="_blank" rel="noopener">Wyświetl</a>
+                                    <form method="post">
+                                        <input type="hidden" name="job_id" value="<?php echo htmlspecialchars((string)($job['id'] ?? ''), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
+                                        <button type="submit" name="action" value="job_download">Pobierz</button>
+                                    </form>
                                 <?php elseif (($job['status'] ?? '') === 'error' && !empty($job['error'])): ?>
                                     <span><?php echo htmlspecialchars((string)$job['error'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></span>
                                 <?php else: ?>
