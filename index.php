@@ -883,6 +883,8 @@ function jpkRunWorker(): void
                 }
                 continue;
             }
+            
+            $log('Start');
 
             if (!is_dir($jobDir)) {
                 $job['status'] = 'error';
