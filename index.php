@@ -178,6 +178,14 @@ function extractInvoiceDataFromText(string $text, string $companyNip): array
         $data['invoice_number'] = trim($m[1]);
     }
 
+    if ($data['invoice_number'] !== null) {
+        $data['invoice_number'] = preg_replace('/\s+/u', ' ', trim((string)$data['invoice_number']));
+
+        if ($data['invoice_number'] === '' || !preg_match('/\d/u', $data['invoice_number'])) {
+            $data['invoice_number'] = null;
+        }
+    }
+
     if (preg_match('/Data\s+wystawienia:\s*[^\d\r\n]*?(\d{4}-\d{2}-\d{2})/iu', $text, $m)) {
         $data['issue_date'] = $m[1];
     }
@@ -644,7 +652,29 @@ function generateJpkFaXml(array $invoices, array $meta): string
     $ewidencja = $dom->createElementNS($tns, 'Ewidencja');
 
     $lp = 1;
+    $rowCount = 0;
     foreach ($invoices as $invoice) {
+        $number = preg_replace('/\s+/u', ' ', trim((string)($invoice['invoice_number'] ?? '')));
+        $issueDate = trim((string)($invoice['issue_date'] ?? ''));
+        $sellDate = trim((string)($invoice['sell_date'] ?? ''));
+
+        if ($sellDate === '' && $issueDate !== '') {
+            $sellDate = $issueDate;
+        }
+
+        if ($number === '' || !preg_match('/\d/u', $number)) {
+            continue;
+        }
+
+        if (
+            $issueDate === '' ||
+            !preg_match('/^\d{4}-\d{2}-\d{2}$/', $issueDate) ||
+            $sellDate === '' ||
+            !preg_match('/^\d{4}-\d{2}-\d{2}$/', $sellDate)
+        ) {
+            continue;
+        }
+
         $sprzedaz = $dom->createElementNS($tns, 'SprzedazWiersz');
         $sprzedaz->appendChild($dom->createElementNS($tns, 'LpSprzedazy', (string)$lp));
 
@@ -654,13 +684,10 @@ function generateJpkFaXml(array $invoices, array $meta): string
         $buyerName = $invoice['buyer_name'] ?? ($meta['buyer_name'] ?? 'Nabywca');
         $sprzedaz->appendChild($dom->createElementNS($tns, 'NazwaKontrahenta', $buyerName));
 
-        $number = $invoice['invoice_number'] ?? '';
         $sprzedaz->appendChild($dom->createElementNS($tns, 'DowodSprzedazy', $number));
 
-        $issueDate = $invoice['issue_date'] ?? '';
         $sprzedaz->appendChild($dom->createElementNS($tns, 'DataWystawienia', $issueDate));
 
-        $sellDate = $invoice['sell_date'] ?? $issueDate;
         $sprzedaz->appendChild($dom->createElementNS($tns, 'DataSprzedazy', $sellDate));
 
         $sprzedaz->appendChild($dom->createElementNS($tns, 'GTU_12', '1'));
@@ -677,6 +704,7 @@ function generateJpkFaXml(array $invoices, array $meta): string
         $totalVat += $vat;
 
         $lp++;
+        $rowCount++;
     }
 
     $pozycje = $dom->createElementNS($tns, 'PozycjeSzczegolowe');
@@ -691,7 +719,7 @@ function generateJpkFaXml(array $invoices, array $meta): string
     $jpk->appendChild($deklaracja);
 
     $sprzedazCtrl = $dom->createElementNS($tns, 'SprzedazCtrl');
-    $sprzedazCtrl->appendChild($dom->createElementNS($tns, 'LiczbaWierszySprzedazy', (string)count($invoices)));
+    $sprzedazCtrl->appendChild($dom->createElementNS($tns, 'LiczbaWierszySprzedazy', (string)$rowCount));
     $sprzedazCtrl->appendChild($dom->createElementNS($tns, 'PodatekNalezny', number_format($totalVat, 2, '.', '')));
     $ewidencja->appendChild($sprzedazCtrl);
 
