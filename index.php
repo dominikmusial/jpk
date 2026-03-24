@@ -687,9 +687,7 @@ function generateJpkFaXml(array $invoices, array $meta): string
 
         $sprzedaz->appendChild($dom->createElementNS($tns, 'tns:DataWystawienia', $issueDate));
 
-        if (!empty($invoice['gtu_12']) || !empty($meta['gtu_12'])) {
-            $sprzedaz->appendChild($dom->createElementNS($tns, 'tns:GTU_12', '1'));
-        }
+        $sprzedaz->appendChild($dom->createElementNS($tns, 'tns:GTU_12', '1'));
 
         $net = (float)($invoice['net_amount'] ?? 0);
         $vat = (float)($invoice['vat_amount'] ?? 0);
